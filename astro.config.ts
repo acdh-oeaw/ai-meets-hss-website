@@ -1,81 +1,74 @@
+import * as path from "node:path";
+
 import mdx from "@astrojs/mdx";
-import node from "@astrojs/node";
-import react from "@astrojs/react";
 import sitemap from "@astrojs/sitemap";
-import solidJs from "@astrojs/solid-js";
-import { defineConfig } from "astro/config";
+import svelte from "@astrojs/svelte";
+import tailwindcss from "@tailwindcss/vite";
+import { defineConfig, fontProviders } from "astro/config";
 import icon from "astro-icon";
-import type { Writable } from "type-fest";
 import { loadEnv } from "vite";
 
-import { reactFiles } from "./eslint.config";
-import { defaultLocale, locales } from "./src/config/i18n.config";
+import { defaultLocale } from "./src/lib/i18n/locales";
+import { localeToPrefix } from "./src/lib/i18n/routing";
 
-const env = loadEnv(import.meta.env.MODE, process.cwd(), "");
+// eslint-disable-next-line no-restricted-syntax
+const env = loadEnv(process.env.NODE_ENV ?? "development", process.cwd(), "");
 
 export default defineConfig({
-	/**
-	 * When switching to static site generation, place an empty `index.astro` file in
-	 * the `src/pages` folder, so `astro` will generate a redirect to the default locale
-	 * via `<meta http-equiv="refresh" content="0;url=/en/">`.
-	 */
-	adapter: node({
-		mode: "standalone",
-	}),
 	base: env.PUBLIC_APP_BASE_PATH,
-	i18n: {
-		defaultLocale,
-		locales: locales as Writable<typeof locales>,
-		routing: {
-			prefixDefaultLocale: true,
-		},
+	experimental: {
+		fonts: [
+			{
+				provider: fontProviders.google(),
+				name: "Inter",
+				cssVariable: "--_font-body",
+				weights: ["100 900"],
+			},
+		],
 	},
 	integrations: [
 		icon({
+			iconDir: "./src/assets/icons",
 			/** @see https://www.astroicon.dev/reference/configuration/#include */
 			include: {
-				lucide: ["chevron-down", "menu", "message-circle", "search", "square-arrow-left", "x"],
-				simpleIcons: ["orcid"],
+				lucide: ["chevron-down", "globe", "mail", "menu"],
+			},
+			svgoOptions: {
+				multipass: true,
+				plugins: [{ name: "preset-default", params: { overrides: { removeViewBox: false } } }],
 			},
 		}),
-		/** Only needed to make the astro jsx runtime work correctly. */
+		/**
+		 * Even though we are using our own mdx processing pipeline, the astro mdx integration is
+		 * required. Not entirely sure why, but probably because it disables the built-in astro-jsx
+		 * plugin.
+		 */
 		mdx(),
-		react({
-			include: reactFiles,
+		svelte({
+			exclude: ["**/keystatic/**"],
 		}),
 		sitemap({
 			i18n: {
+				locales: localeToPrefix,
 				defaultLocale,
-				locales: Object.fromEntries(
-					locales.map((locale) => {
-						return [locale, locale];
-					}),
-				),
 			},
 		}),
-		solidJs({
-			exclude: reactFiles,
-		}),
 	],
-	prefetch: {
-		defaultStrategy: "hover",
-		prefetchAll: true,
-	},
-	redirects: {
-		"/admin": {
-			destination:
-				env.PUBLIC_APP_BASE_PATH != null
-					? `${env.PUBLIC_APP_BASE_PATH.replace(/\/$/, "")}/keystatic`
-					: "/keystatic",
-			status: 307,
-		},
-	},
-	scopedStyleStrategy: "where",
 	server: {
-		/** Required by keystatic. */
-		host: "127.0.0.1",
 		port: 3000,
 	},
-	site: env.PUBLIC_APP_BASE_URL,
-	publicDir: "public",
+	site: env.PUBLIC_APP_BASE_URL!,
+	vite: {
+		plugins: [tailwindcss()],
+		resolve: {
+			alias: {
+				"@content": path.resolve(".content/generated"),
+			},
+		},
+		server: {
+			watch: {
+				ignored: ["content/**"],
+			},
+		},
+	},
 });

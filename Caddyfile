@@ -1,0 +1,7 @@
+:3000 {
+	root * /usr/share/caddy
+
+	redir / /en/ 302
+
+	file_server
+}

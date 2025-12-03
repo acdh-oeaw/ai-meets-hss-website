@@ -1,0 +1,71 @@
+{
+	"mdx": {
+		"footnote-back-label": "Zurück zur Referenz {reference}",
+		"footnotes": "Fußnoten"
+	},
+	"DefaultFooter": {
+		"navigation": {
+			"items": {
+				"contact": "Kontakt",
+				"home": "Startseite",
+				"imprint": "Impressum"
+			},
+			"label": "Zusätzliche"
+		},
+		"navigation-social-media": {
+			"items": {
+				"bluesky": "Bluesky",
+				"email": "Email",
+				"facebook": "Facebook",
+				"flickr": "Flickr",
+				"github": "GitHub",
+				"instagram": "Instagram",
+				"linkedin": "LinkedIn",
+				"mastodon": "Mastodon",
+				"orcid": "ORCID",
+				"twitter": "Twitter",
+				"website": "Website",
+				"youtube": "YouTube"
+			},
+			"label": "Social media"
+		}
+	},
+	"DefaultHeader": {
+		"navigation": {
+			"menu": {
+				"open": "Menü öffnen"
+			},
+			"items": {
+				"home": "Startseite"
+			},
+			"label": "Haupt"
+		}
+	},
+	"DefaultLayout": {
+		"skip-link": "Zum Hauptinhalt springen"
+	},
+	"ErrorPage": {
+		"meta": {
+			"title": "Fehler"
+		},
+		"reset": "Erneut versuchen",
+		"title": "Etwas ist schief gelaufen"
+	},
+	"ImprintPage": {
+		"meta": {
+			"title": "Impressum"
+		},
+		"title": "Impressum"
+	},
+	"IndexPage": {
+		"meta": {
+			"title": "Startseite"
+		}
+	},
+	"NotFoundPage": {
+		"meta": {
+			"title": "Seite nicht gefunden"
+		},
+		"title": "Seite nicht gefunden"
+	}
+}

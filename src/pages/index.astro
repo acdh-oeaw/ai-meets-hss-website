@@ -1,16 +1,8 @@
 ---
-import { defaultLocale } from "@/config/i18n.config";
+import { defaultLocale } from "@/lib/i18n/locales";
+import { localeToPrefix } from "@/lib/i18n/routing";
+import { withBasePath } from "@/lib/navigation/with-base-path";
 
-import { withBasePath } from "../lib/with-base-path";
-
-export const prerender = false;
-
-/**
- * The typescript warning is about:
- *
- * @see https://github.com/withastro/language-tools/issues/476
- */
-const locale = Astro.preferredLocale ?? defaultLocale;
-
-return Astro.redirect(withBasePath(`/${locale}/`), 307);
+// eslint-disable-next-line unicorn/prefer-module
+return Astro.redirect(withBasePath(`/${localeToPrefix[defaultLocale]}`), 307);
 ---

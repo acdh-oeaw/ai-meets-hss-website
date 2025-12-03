@@ -1,0 +1,82 @@
+---
+import assert from "node:assert/strict";
+
+import type { GetStaticPathsResult } from "astro";
+import { Image } from "astro:assets";
+
+import DefaultLayout from "@/components/default-layout.astro";
+import DocumentBody from "@/components/document-body.astro";
+import DocumentHead from "@/components/document-head.astro";
+import DocumentMetadata from "@/components/document-metadata.astro";
+import HtmlDocument from "@/components/html-document.astro";
+import { createClient } from "@/lib/content/create-client";
+import { getIntlLanguage, locales } from "@/lib/i18n/locales";
+import { localeToPrefix } from "@/lib/i18n/routing";
+
+export async function getStaticPaths() {
+	const paths = (
+		await Promise.all(
+			locales.map(async (locale) => {
+				const client = await createClient(getIntlLanguage(locale));
+
+				const ids = await client.collections.events.ids();
+
+				return Promise.all(
+					ids.map(async (id) => {
+						const page = await client.collections.events.get(id);
+
+						assert(page != null, `Failed to prerender page "${id}".`);
+
+						return { params: { id, locale: localeToPrefix[locale] }, props: { page } };
+					}),
+				);
+			}),
+		)
+	).flat();
+
+	return paths satisfies GetStaticPathsResult;
+}
+
+const { page } = Astro.props;
+
+const { image, title } = page.metadata;
+const Content = page.content;
+---
+
+<HtmlDocument>
+	<DocumentHead>
+		<DocumentMetadata title={title} />
+	</DocumentHead>
+
+	<DocumentBody>
+		<DefaultLayout>
+			<div class="relative w-full border-b border-stroke-weak">
+				{
+					image != null ? (
+						<figure class="absolute inset-0 -z-10 size-full overflow-hidden">
+							<Image
+								alt=""
+								class="size-full object-cover"
+								layout="full-width"
+								loading="eager"
+								src={image}
+							/>
+							<div class="absolute inset-0 size-full bg-black/60" />
+						</figure>
+					) : null
+				}
+				<section class="container richtext max-w-(--breakpoint-md) px-4 py-6 xs:py-16 sm:px-8">
+					<h1
+						class="py-8 text-3xl font-extrabold tracking-tight lowercase xs:text-6xl"
+						class:list={image != null ? "text-white" : "text-text-strong"}
+					>
+						{title}
+					</h1>
+				</section>
+			</div>
+			<section class="container richtext max-w-(--breakpoint-md) px-4 py-12 sm:px-8">
+				<Content />
+			</section>
+		</DefaultLayout>
+	</DocumentBody>
+</HtmlDocument>

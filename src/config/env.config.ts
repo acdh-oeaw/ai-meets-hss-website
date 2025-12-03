@@ -1,88 +1,96 @@
-import { log } from "@acdh-oeaw/lib";
-import { createEnv } from "@acdh-oeaw/validate-env/astro";
+/* eslint-disable no-restricted-syntax */
+
+import { err, isErr, ok } from "@acdh-oeaw/lib";
+import { createEnv, ValidationError } from "@acdh-oeaw/validate-env/astro";
 import * as v from "valibot";
 
-const environment = import.meta.env.SSR
-	? Object.assign({}, process.env, import.meta.env)
-	: import.meta.env;
+const environment =
+	// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+	import.meta.env === undefined
+		? process.env
+		: import.meta.env.SSR
+			? Object.assign({}, process.env, import.meta.env)
+			: import.meta.env;
 
-export const env = createEnv({
+const result = createEnv({
+	schemas: {
+		system(environment) {
+			const schema = v.object({
+				NODE_ENV: v.optional(v.picklist(["development", "production", "test"]), "production"),
+			});
+
+			const result = v.safeParse(schema, environment);
+
+			if (!result.success) {
+				return err(
+					new ValidationError(
+						`Invalid or missing environment variables.\n${v.summarize(result.issues)}`,
+					),
+				);
+			}
+
+			return ok(result.output);
+		},
+		private(environment) {
+			const schema = v.object({
+				CI: v.optional(v.pipe(v.unknown(), v.transform(Boolean), v.boolean())),
+			});
+
+			const result = v.safeParse(schema, environment);
+
+			if (!result.success) {
+				return err(
+					new ValidationError(
+						`Invalid or missing environment variables.\n${v.summarize(result.issues)}`,
+					),
+				);
+			}
+
+			return ok(result.output);
+		},
+		public(environment) {
+			const schema = v.object({
+				PUBLIC_APP_BASE_PATH: v.optional(v.pipe(v.string(), v.nonEmpty())),
+				PUBLIC_APP_BASE_URL: v.pipe(v.string(), v.url()),
+				PUBLIC_BOTS: v.optional(v.picklist(["disabled", "enabled"]), "disabled"),
+				PUBLIC_GOOGLE_SITE_VERIFICATION: v.optional(v.pipe(v.string(), v.nonEmpty())),
+				PUBLIC_IMPRINT_SERVICE_BASE_URL: v.pipe(v.string(), v.url()),
+				PUBLIC_MATOMO_BASE_URL: v.optional(v.pipe(v.string(), v.url())),
+				PUBLIC_MATOMO_ID: v.optional(
+					v.pipe(v.string(), v.transform(Number), v.number(), v.integer(), v.minValue(1)),
+				),
+				PUBLIC_REDMINE_ID: v.pipe(
+					v.string(),
+					v.transform(Number),
+					v.number(),
+					v.integer(),
+					v.minValue(1),
+				),
+			});
+
+			const result = v.safeParse(schema, environment);
+
+			if (!result.success) {
+				return err(
+					new ValidationError(
+						`Invalid or missing environment variables.\n${v.summarize(result.issues)}`,
+					),
+				);
+			}
+
+			return ok(result.output);
+		},
+	},
 	environment,
-	system(input) {
-		const Schema = v.object({
-			NODE_ENV: v.optional(v.picklist(["development", "production", "test"]), "production"),
-		});
-		return v.parse(Schema, input);
-	},
-	private(input) {
-		const Schema = v.object({
-			EMAIL_CONTACT_ADDRESS: v.optional(v.pipe(v.string(), v.email())),
-			EMAIL_CONTACT_ADDRESS_BCC: v.optional(v.pipe(v.string(), v.email())),
-			EMAIL_SMTP_PORT: v.optional(
-				v.pipe(v.string(), v.transform(Number), v.number(), v.integer(), v.minValue(1)),
-			),
-			EMAIL_SMTP_SERVER: v.optional(v.pipe(v.string(), v.nonEmpty())),
-			EMAIL_SMTP_USERNAME: v.optional(v.pipe(v.string(), v.nonEmpty())),
-			EMAIL_SMTP_PASSWORD: v.optional(v.pipe(v.string(), v.nonEmpty())),
-			KEYSTATIC_GITHUB_CLIENT_ID: v.optional(v.pipe(v.string(), v.nonEmpty())),
-			KEYSTATIC_GITHUB_CLIENT_SECRET: v.optional(v.pipe(v.string(), v.nonEmpty())),
-			KEYSTATIC_SECRET: v.optional(v.pipe(v.string(), v.nonEmpty())),
-			BASEROW_API_KEY: v.optional(v.pipe(v.string(), v.nonEmpty())),
-			BASEROW_TABLE_ID_CONFERENCE: v.optional(
-				v.pipe(v.string(), v.transform(Number), v.number(), v.integer(), v.minValue(1)),
-			),
-			BASEROW_TABLE_ID_DISKUSSION: v.optional(
-				v.pipe(v.string(), v.transform(Number), v.number(), v.integer(), v.minValue(1)),
-			),
-			BASEROW_TABLE_ID_SUBMISSIONS: v.optional(
-				v.pipe(v.string(), v.transform(Number), v.number(), v.integer(), v.minValue(1)),
-			),
-			FS_ABSTRACTS_PATH: v.optional(v.pipe(v.string(), v.nonEmpty())),
-		});
-		return v.parse(Schema, input);
-	},
-	public(input) {
-		const Schema = v.object({
-			PUBLIC_APP_BASE_PATH: v.optional(v.pipe(v.string(), v.nonEmpty())),
-			PUBLIC_APP_BASE_URL: v.pipe(v.string(), v.url()),
-			PUBLIC_BOTS: v.optional(v.picklist(["disabled", "enabled"]), "disabled"),
-			PUBLIC_GOOGLE_SITE_VERIFICATION: v.optional(v.string()),
-			PUBLIC_KEYSTATIC_GITHUB_APP_SLUG: v.optional(v.pipe(v.string(), v.nonEmpty())),
-			PUBLIC_KEYSTATIC_GITHUB_REPO_NAME: v.optional(v.pipe(v.string(), v.nonEmpty())),
-			PUBLIC_KEYSTATIC_GITHUB_REPO_OWNER: v.optional(v.pipe(v.string(), v.nonEmpty())),
-			PUBLIC_KEYSTATIC_MODE: v.optional(v.picklist(["github", "local"]), "local"),
-			PUBLIC_MATOMO_BASE_URL: v.optional(v.pipe(v.string(), v.url())),
-			PUBLIC_MATOMO_ID: v.optional(
-				v.pipe(v.string(), v.transform(Number), v.number(), v.integer(), v.minValue(1)),
-			),
-			PUBLIC_REDMINE_ID: v.pipe(
-				v.string(),
-				v.transform(Number),
-				v.number(),
-				v.integer(),
-				v.minValue(1),
-			),
-			PUBLIC_BASEROW_API_BASE_URL: v.optional(v.pipe(v.string(), v.url())),
-		});
-		return v.parse(Schema, input);
-	},
 	validation: v.parse(
 		v.optional(v.picklist(["disabled", "enabled", "public"]), "enabled"),
 		environment.ENV_VALIDATION,
 	),
-	onError(error) {
-		if (error instanceof v.ValiError) {
-			const message = "Invalid environment variables";
-
-			// eslint-disable-next-line @typescript-eslint/no-explicit-any
-			log.error(`${message}:`, v.flatten<any>(error.issues).nested);
-
-			const validationError = new Error(message);
-			delete validationError.stack;
-
-			throw validationError;
-		}
-
-		throw error;
-	},
 });
+
+if (isErr(result)) {
+	delete result.error.stack;
+	throw result.error;
+}
+
+export const env = result.value;

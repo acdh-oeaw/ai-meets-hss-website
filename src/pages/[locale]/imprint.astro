@@ -1,62 +1,47 @@
 ---
-import { request } from "@acdh-oeaw/lib";
+import { createUrl, createUrlSearchParams, request } from "@acdh-oeaw/lib";
 import type { GetStaticPathsResult } from "astro";
 
-import ImageOverlay from "@/components/image-overlay.astro";
-import Section from "@/components/section.astro";
-import { locales } from "@/config/i18n.config";
-import { createImprintUrl } from "@/config/imprint.config";
-import Layout from "@/layouts/page.layout.astro";
-import { createI18n } from "@/lib/i18n/create-i18n";
+import DefaultLayout from "@/components/default-layout.astro";
+import DocumentBody from "@/components/document-body.astro";
+import DocumentHead from "@/components/document-head.astro";
+import DocumentMetadata from "@/components/document-metadata.astro";
+import HtmlDocument from "@/components/html-document.astro";
+import { env } from "@/config/env.config";
+import { getTranslations } from "@/lib/i18n/get-translations";
+import { locales } from "@/lib/i18n/locales";
+import { localeToPrefix } from "@/lib/i18n/routing";
 
-export async function getStaticPaths() {
-	return locales.map((locale) => {
-		return { params: { locale } };
-	}) satisfies GetStaticPathsResult;
+export function getStaticPaths() {
+	const paths = locales.map((locale) => {
+		return { params: { locale: localeToPrefix[locale] } };
+	});
+
+	return paths satisfies GetStaticPathsResult;
 }
 
-const { locale } = Astro.params;
+const { locale } = Astro.locals;
+const t = await getTranslations(locale, "ImprintPage");
 
-const { t } = await createI18n(locale);
-
-const title = t("common.imprint");
-const image = { caption: "", src: null };
-const content = await request(createImprintUrl(locale), { responseType: "text" });
+const imprintUrl = createUrl({
+	baseUrl: env.PUBLIC_IMPRINT_SERVICE_BASE_URL,
+	pathname: `/${String(env.PUBLIC_REDMINE_ID)}`,
+	searchParams: createUrlSearchParams({ locale }),
+});
+const imprintHtml = await request(imprintUrl, { responseType: "text" });
 ---
 
-<Layout locale={locale} title={title}>
-	<main class="mb-2xl">
-		<section class:list={[image?.src && "border-b border-neutral-200"]} class="relative">
-			{
-				image?.src ? (
-					<figure>
-						<img
-							alt=""
-							class="absolute inset-0 size-full object-cover"
-							loading="eager"
-							src={image.src}
-						/>
-						{image.caption ? (
-							<figcaption class="absolute bottom-1.5 right-2 z-10 text-xs font-medium text-neutral-300">
-								{image.caption}
-							</figcaption>
-						) : null}
-						<ImageOverlay />
-					</figure>
-				) : null
-			}
-			<div
-				class:list={[image?.src ? "text-white" : "border-b border-neutral-200"]}
-				class="container relative py-2xl"
-			>
-				<div class="grid gap-y-sm">
-					<h1 class="text-display lowercase">{title}</h1>
-				</div>
-			</div>
-		</section>
+<HtmlDocument>
+	<DocumentHead>
+		<DocumentMetadata title={t("meta.title")} />
+	</DocumentHead>
 
-		<Section>
-			<div class="container prose py-xl" set:html={content} />
-		</Section>
-	</main>
-</Layout>
+	<DocumentBody>
+		<DefaultLayout>
+			<section class="container richtext max-w-(--breakpoint-md) px-4 py-6 xs:py-16 sm:px-8">
+				<h1>{t("title")}</h1>
+				<div set:html={imprintHtml} />
+			</section>
+		</DefaultLayout>
+	</DocumentBody>
+</HtmlDocument>
