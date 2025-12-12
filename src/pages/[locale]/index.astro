@@ -1,157 +1,75 @@
 ---
 import type { GetStaticPathsResult } from "astro";
+import { Image } from "astro:assets";
 
-import Card from "@/components/card.astro";
-import GridList from "@/components/grid-list.astro";
-import ImageOverlay from "@/components/image-overlay.astro";
-import Section from "@/components/section.astro";
-import SectionLead from "@/components/section-lead.astro";
-import SectionTitle from "@/components/section-title.astro";
-import { locales } from "@/config/i18n.config";
-import Layout from "@/layouts/page.layout.astro";
-import { createCollectionResource, createSingletonResource } from "@/lib/content/create-resource";
-import { createI18n } from "@/lib/i18n/create-i18n";
+import DefaultLayout from "@/components/default-layout.astro";
+import DocumentBody from "@/components/document-body.astro";
+import DocumentHead from "@/components/document-head.astro";
+import DocumentMetadata from "@/components/document-metadata.astro";
+import HtmlDocument from "@/components/html-document.astro";
+import { createClient } from "@/lib/content/create-client";
+import { getTranslations } from "@/lib/i18n/get-translations";
+import { getIntlLanguage, locales } from "@/lib/i18n/locales";
+import { localeToPrefix } from "@/lib/i18n/routing";
 
-export async function getStaticPaths() {
-	return locales.map((locale) => {
-		return { params: { locale } };
-	}) satisfies GetStaticPathsResult;
+export function getStaticPaths() {
+	const paths = locales.map((locale) => {
+		return { params: { locale: localeToPrefix[locale] } };
+	});
+
+	return paths satisfies GetStaticPathsResult;
 }
 
-const { locale } = Astro.params;
+const { locale } = Astro.locals;
+const t = await getTranslations(locale, "IndexPage");
 
-const { t } = await createI18n(locale);
+const client = await createClient(getIntlLanguage(locale));
 
-const page = await createSingletonResource("indexPage", locale).read();
+const page = await client.singletons.indexPage.get();
 
-const { hero, content, sections } = page.data;
-
-const { default: Content } = await page.compile(content);
+const { image, subtitle, title } = page.metadata;
+const Content = page.content;
 ---
 
-<Layout locale={locale} title={hero.title}>
-	<main class="mb-2xl">
-		<section class:list={[hero.image?.src && "border-b border-neutral-200"]} class="relative">
-			{
-				hero.image?.src ? (
-					<figure>
-						<img
-							alt=""
-							class="absolute inset-0 size-full object-cover"
-							loading="eager"
-							src={hero.image.src}
-						/>
-						<ImageOverlay />
-						{hero.image.caption ? (
-							<figcaption class="absolute bottom-2 right-2 z-10 text-xs font-medium">
-								{hero.image.caption}
-							</figcaption>
-						) : null}
-					</figure>
-				) : null
-			}
-			<div
-				class:list={[hero.image?.src ? "text-white" : "border-b border-neutral-200"]}
-				class="container relative z-10 py-2xl"
-			>
-				<div class="grid justify-start justify-items-start gap-y-xs py-2xl sm:gap-y-0">
-					<!-- <h1 class="text-display lowercase text-text-strong">{hero.title}</h1> -->
-					<!-- <p class="text-heading-2 text-text-weak">{hero.subtitle}</p> -->
-					<h1
-						class="relative inline-block text-5xl font-bold lowercase tracking-tighter before:absolute xs:text-6xl sm:text-7xl md:text-8xl"
-					>
-						{hero.title}
-					</h1>
-					<p
-						class:list={[hero.image?.src ? "text-white" : "text-text-weak"]}
-						class="relative inline-block text-2xl font-semibold tracking-tight sm:ml-12 md:ml-16 md:text-3xl"
-					>
-						{hero.subtitle}
-					</p>
-					{hero.lead ? <div class="text-lead text-text-weak">{hero.lead}</div> : null}
+<HtmlDocument>
+	<DocumentHead>
+		<DocumentMetadata title={t("meta.title")} />
+	</DocumentHead>
+
+	<DocumentBody>
+		<DefaultLayout>
+			<section class="relative w-full overflow-hidden">
+				<div class="absolute inset-0 -z-10 size-full">
+					<Image
+						alt=""
+						class="size-full object-cover"
+						layout="full-width"
+						loading="eager"
+						src={image}
+					/>
+					<div class="absolute inset-0 size-full bg-black/60"></div>
 				</div>
-			</div>
-		</section>
-		<Section>
-			<div class="container prose py-xl">
-				{
-					content ? (
-						<Content />
-					) : (
-						<p class="flex justify-center py-xl text-center text-sm text-text-weak">
-							{t("common.coming-soon")}
-						</p>
-					)
-				}
-			</div>
-		</Section>
 
-		{
-			sections.map(async (section) => {
-				switch (section.discriminant) {
-					case "links": {
-						const { lead, links, title } = section.value;
+				<div
+					class="mx-auto flex max-w-(--breakpoint-md) flex-col items-center gap-y-6 px-8 py-12 text-white xs:pt-48 xs:pb-32"
+				>
+					<h1
+						class="text-center font-heading text-4xl font-extrabold tracking-tight lowercase xs:text-7xl"
+					>
+						{title}
+					</h1>
 
-						const pages = createCollectionResource("pages", locale);
+					<p class="text-center text-lg font-semibold xs:text-2xl">
+						{subtitle}
+					</p>
+				</div>
+			</section>
 
-						return (
-							<Section>
-								<div class="container grid content-start gap-y-md border-b py-xl">
-									<SectionTitle>{title}</SectionTitle>
-									<SectionLead>{lead}</SectionLead>
-									{links.length > 0 ? (
-										<GridList>
-											{links.map(async (link) => {
-												switch (link.discriminant) {
-													case "page": {
-														const { id, title } = link.value;
-
-														const page = await pages.read(id);
-
-														const { image, summary } = page.data;
-
-														const href = `/${id}`;
-
-														return (
-															<li>
-																<Card href={href} image={image} title={title}>
-																	<div>{summary}</div>
-																</Card>
-															</li>
-														);
-													}
-												}
-											})}
-										</GridList>
-									) : (
-										<p class="flex justify-center py-xl text-center text-sm text-text-weak">
-											{t("common.coming-soon")}
-										</p>
-									)}
-								</div>
-							</Section>
-						);
-					}
-
-					case "text": {
-						const { content, lead, title } = section.value;
-
-						const { default: Content } = await page.compile(content);
-
-						return (
-							<Section>
-								<div class="container grid content-start gap-y-md border-b py-xl">
-									<SectionTitle>{title}</SectionTitle>
-									<SectionLead>{lead}</SectionLead>
-									<div class="prose text-text-weak">
-										<Content />
-									</div>
-								</div>
-							</Section>
-						);
-					}
-				}
-			})
-		}
-	</main>
-</Layout>
+			<section class="container richtext max-w-(--breakpoint-md) px-4 py-8 sm:px-8 sm:py-12">
+				<div>
+					<Content />
+				</div>
+			</section>
+		</DefaultLayout>
+	</DocumentBody>
+</HtmlDocument>

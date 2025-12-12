@@ -1,126 +1,145 @@
 ---
+import assert from "node:assert/strict";
+
 import type { GetStaticPathsResult } from "astro";
-import { compareDesc } from "date-fns";
+import { Image } from "astro:assets";
 
-import Card from "@/components/card.astro";
-import GridList from "@/components/grid-list.astro";
-import ImageOverlay from "@/components/image-overlay.astro";
-import Section from "@/components/section.astro";
-import { locales } from "@/config/i18n.config";
-import Layout from "@/layouts/page.layout.astro";
-import { createCollectionResource } from "@/lib/content/create-resource";
-import { getFormatter } from "@/lib/formatter";
-import { createI18n } from "@/lib/i18n/create-i18n";
+import DefaultLayout from "@/components/default-layout.astro";
+import DocumentBody from "@/components/document-body.astro";
+import DocumentHead from "@/components/document-head.astro";
+import DocumentMetadata from "@/components/document-metadata.astro";
+import HtmlDocument from "@/components/html-document.astro";
+import Link from "@/components/link.astro";
+import { createClient } from "@/lib/content/create-client";
+import { getFormatter } from "@/lib/i18n/get-formatter";
+import { getTranslations } from "@/lib/i18n/get-translations";
+import { getIntlLanguage, locales } from "@/lib/i18n/locales";
+import { localeToPrefix } from "@/lib/i18n/routing";
 
-export async function getStaticPaths() {
-	return locales.map((locale) => {
-		return { params: { locale } };
-	}) satisfies GetStaticPathsResult;
+export function getStaticPaths() {
+	const paths = locales.map((locale) => {
+		return { params: { locale: localeToPrefix[locale] } };
+	});
+
+	return paths satisfies GetStaticPathsResult;
 }
 
-const { locale } = Astro.params;
-
-const { t } = await createI18n(locale);
-
-const page = await createCollectionResource("pages", locale).read("programme");
-const events = await createCollectionResource("events", locale).all();
-events.sort((a, z) => {
-	return compareDesc(a.data.date, z.data.date);
-});
-
-const { content, image, title } = page.data;
-
-const { default: Content } = await page.compile(content);
-
+const { locale } = Astro.locals;
+const t = await getTranslations(locale, "ProgrammePage");
 const formatter = getFormatter(locale);
+
+const client = await createClient(getIntlLanguage(locale));
+
+const id = "programme";
+const page = await client.collections.pages.get(id);
+assert(page != null, `Failed to prerender page "${id}".`);
+
+const { image, title } = page.metadata;
+const Content = page.content;
+
+const events = await client.collections.events.all();
 ---
 
-<Layout locale={locale} title={title}>
-	<main class="mb-2xl">
-		<section class:list={[image?.src && "border-b border-neutral-200"]} class="relative">
-			{
-				image?.src ? (
-					<figure>
-						<img
-							alt=""
-							class="absolute inset-0 size-full object-cover"
-							loading="eager"
-							src={image.src}
-						/>
-						{image.caption ? (
-							<figcaption class="absolute bottom-1.5 right-2 z-10 text-xs font-medium text-neutral-300">
-								{image.caption}
-							</figcaption>
-						) : null}
-						<ImageOverlay />
-					</figure>
-				) : null
-			}
-			<div
-				class:list={[image?.src ? "text-white" : "border-b border-neutral-200"]}
-				class="container relative py-2xl"
-			>
-				<div class="grid gap-y-sm">
-					<h1 class="text-display lowercase">{title}</h1>
-				</div>
-			</div>
-		</section>
+<HtmlDocument>
+	<DocumentHead>
+		<DocumentMetadata title={title} />
+	</DocumentHead>
 
-		<Section>
-			<div class="container prose py-xl">
+	<DocumentBody>
+		<DefaultLayout>
+			<div class="relative w-full border-b border-stroke-weak">
 				{
-					content ? (
-						<Content />
-					) : (
-						<p class="flex justify-center py-xl text-center text-sm text-text-weak">
-							{t("common.coming-soon")}
-						</p>
-					)
+					image != null && image.src != null ? (
+						<figure class="absolute inset-0 -z-10 size-full overflow-hidden">
+							<Image
+								alt=""
+								class="size-full object-cover"
+								layout="full-width"
+								loading="eager"
+								src={image.src}
+							/>
+							<div class="absolute inset-0 size-full bg-black/60" />
+							{image.caption ? (
+								<figcaption class="absolute right-2 bottom-1.5 z-10 text-xs font-medium text-white/50">
+									{image.caption}
+								</figcaption>
+							) : null}
+						</figure>
+					) : null
 				}
+				<section class="container richtext max-w-(--breakpoint-md) px-4 py-6 sm:px-8">
+					<h1
+						class="py-8 text-3xl font-extrabold tracking-tight lowercase xs:text-6xl"
+						class:list={image.src != null ? "text-white" : "text-text-strong"}
+					>
+						{title}
+					</h1>
+				</section>
 			</div>
-		</Section>
+			<section class="container richtext max-w-(--breakpoint-md) px-4 py-12 sm:px-8">
+				<Content />
+			</section>
+			<section class="container max-w-(--breakpoint-lg) px-4 py-12 sm:px-8">
+				<ul
+					class="grid grid-cols-[repeat(auto-fill,minmax(min(100%,18rem),1fr))] gap-6"
+					role="list"
+				>
+					{
+						events.map((event) => {
+							const { metadata, id } = event;
 
-		<Section>
-			<div class="container py-xl">
-				{
-					events.length > 0 ? (
-						<GridList>
-							{events
-								.map((event) => {
-									const { data, id } = event;
+							const { date, image, title, summary } = metadata;
 
-									const { date, image, title, summary } = data;
+							const href = `/programme/${id}`;
 
-									const href = `/programme/${id}`;
-
-									return (
-										<li>
-											<Card href={href} image={image} title={title}>
-												<dl class="grid content-start gap-y-xs text-text-weak">
-													<div class="leading-snug">
-														<dt class="text-uppercase uppercase">{t("common.date")}</dt>
-														<dd class="font-medium">
-															<time datetime={date}>{formatter.date.format(new Date(date))}</time>
-														</dd>
-													</div>
-													<div class="leading-snug">
-														<dt class="text-uppercase uppercase">Summary</dt>
-														<dd class="font-medium">{summary}</dd>
-													</div>
-												</dl>
-											</Card>
-										</li>
-									);
-								})
-								.reverse()}
-						</GridList>
-					) : (
-						<p class="flex justify-center py-xl text-center text-sm text-text-weak">
-							{t("common.coming-soon")}
-						</p>
-					)
-				}
-			</div>
-		</Section>
-	</main>
-</Layout>
+							return (
+								<li>
+									<article class="relative overflow-hidden rounded-sm border border-stroke-weak shadow-md transition hover:shadow-xl">
+										<div class="relative aspect-video border-b border-stroke-weak">
+											{image?.src != null ? (
+												<Fragment>
+													<img
+														alt=""
+														class="absolute inset-0 size-full object-cover"
+														loading="lazy"
+														src={image.src}
+													/>
+													<div class="absolute inset-0 size-full bg-black/30" />
+												</Fragment>
+											) : null}
+										</div>
+										<div class="flex flex-col gap-y-2 p-6 text-sm">
+											<h2 class="text-lg font-semibold text-text-strong">
+												<Link class="after:absolute after:inset-0" href={href}>
+													{title}
+												</Link>
+											</h2>
+											<dl class="flex flex-col gap-y-1.5 text-text-weak">
+												<div class="leading-snug">
+													<dt class="text-xs font-semibold tracking-wider text-neutral-500 uppercase">
+														{t("date")}
+													</dt>
+													<dd class="font-medium">
+														<time datetime={date}>
+															{formatter.dateTime(new Date(date), { dateStyle: "long" })}
+														</time>
+													</dd>
+												</div>
+												<div class="leading-snug">
+													<dt class="text-xs font-semibold tracking-wider text-neutral-500 uppercase">
+														{t("summary")}
+													</dt>
+													<dd class="font-medium">{summary}</dd>
+												</div>
+											</dl>
+										</div>
+									</article>
+								</li>
+							);
+						})
+					}
+				</ul>
+			</section>
+		</DefaultLayout>
+	</DocumentBody>
+</HtmlDocument>

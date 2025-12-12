@@ -1,0 +1,75 @@
+{
+	"mdx": {
+		"footnote-back-label": "Back to reference {reference}",
+		"footnotes": "Footnotes"
+	},
+	"DefaultFooter": {
+		"navigation": {
+			"items": {
+				"contact": "Contact",
+				"home": "Home",
+				"imprint": "Imprint"
+			},
+			"label": "Secondary"
+		},
+		"navigation-social-media": {
+			"items": {
+				"bluesky": "Bluesky",
+				"email": "Email",
+				"facebook": "Facebook",
+				"flickr": "Flickr",
+				"github": "GitHub",
+				"instagram": "Instagram",
+				"linkedin": "LinkedIn",
+				"mastodon": "Mastodon",
+				"orcid": "ORCID",
+				"twitter": "Twitter",
+				"website": "Website",
+				"youtube": "YouTube"
+			},
+			"label": "Social media"
+		}
+	},
+	"DefaultHeader": {
+		"navigation": {
+			"menu": {
+				"open": "Open navigation menu"
+			},
+			"items": {
+				"home": "Home"
+			},
+			"label": "Main"
+		}
+	},
+	"DefaultLayout": {
+		"skip-link": "Skip to main content"
+	},
+	"ErrorPage": {
+		"meta": {
+			"title": "Error"
+		},
+		"reset": "Try again",
+		"title": "Something went wrong"
+	},
+	"ImprintPage": {
+		"meta": {
+			"title": "Imprint"
+		},
+		"title": "Imprint"
+	},
+	"IndexPage": {
+		"meta": {
+			"title": "Home"
+		}
+	},
+	"NotFoundPage": {
+		"meta": {
+			"title": "Page not found"
+		},
+		"title": "Page not found"
+	},
+	"ProgrammePage": {
+		"date": "Date",
+		"summary": "Summary"
+	}
+}

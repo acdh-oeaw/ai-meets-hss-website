@@ -1,10 +1,12 @@
-# syntax=docker/dockerfile:1
+# syntax=docker/dockerfile:1-labs
+# labs version is needed for `COPY --exclude`.
+# @see https://docs.docker.com/reference/dockerfile/#copy---exclude
 
 # using alpine base image to avoid `sharp` memory leaks.
 # @see https://sharp.pixelplumbing.com/install#linux-memory-allocator
 
-# base
-FROM node:22-alpine AS base
+# build
+FROM node:24-alpine AS build
 
 RUN corepack enable
 
@@ -13,30 +15,21 @@ WORKDIR /app
 
 USER node
 
-COPY --chown=node:node .npmrc package.json pnpm-lock.yaml ./
-COPY --chown=node:node patches ./patches
+COPY --chown=node:node .npmrc package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+# COPY --chown=node:node ./patches ./patches
 
-RUN pnpm fetch --prod
-RUN pnpm install --frozen-lockfile --ignore-scripts --offline --prod
+ENV CI=true
+ENV SKIP_INSTALL_SIMPLE_GIT_HOOKS=1
 
-# build
-FROM base AS build
-
-RUN pnpm fetch --dev
+RUN pnpm fetch
 
 COPY --chown=node:node ./ ./
-
-# astro assets cache
-COPY --chown=node:node ./node_modules/.astro ./node_modules/.astro
 
 ARG PUBLIC_APP_BASE_PATH
 ARG PUBLIC_APP_BASE_URL
 ARG PUBLIC_BOTS
 ARG PUBLIC_GOOGLE_SITE_VERIFICATION
-ARG PUBLIC_KEYSTATIC_GITHUB_APP_SLUG
-ARG PUBLIC_KEYSTATIC_GITHUB_REPO_NAME
-ARG PUBLIC_KEYSTATIC_GITHUB_REPO_OWNER
-ARG PUBLIC_KEYSTATIC_MODE
+ARG PUBLIC_IMPRINT_SERVICE_BASE_URL
 ARG PUBLIC_MATOMO_BASE_URL
 ARG PUBLIC_MATOMO_ID
 ARG PUBLIC_REDMINE_ID
@@ -48,35 +41,20 @@ RUN pnpm install --frozen-lockfile --offline
 
 ENV NODE_ENV=production
 
-RUN --mount=type=secret,id=KEYSTATIC_GITHUB_CLIENT_ID,uid=1000 \
-		--mount=type=secret,id=KEYSTATIC_GITHUB_CLIENT_SECRET,uid=1000 \
-		--mount=type=secret,id=KEYSTATIC_SECRET,uid=1000 \
-			KEYSTATIC_GITHUB_CLIENT_ID=$(cat /run/secrets/KEYSTATIC_GITHUB_CLIENT_ID) \
-			KEYSTATIC_GITHUB_CLIENT_SECRET=$(cat /run/secrets/KEYSTATIC_GITHUB_CLIENT_SECRET) \
-			KEYSTATIC_SECRET=$(cat /run/secrets/KEYSTATIC_SECRET) \
-		pnpm run build
+# to mount secrets which need to be available at build time
+# @see https://docs.docker.com/build/building/secrets/
+RUN pnpm run build
 
 # serve
-FROM node:22-alpine AS serve
+FROM caddy:2-alpine AS serve
 
-RUN apk --no-cache add shadow
+WORKDIR /usr/share/caddy
 
-RUN mkdir /app && chown -R node:node /app
-WORKDIR /app
+# exclude assets which should have been optimized with `astro:assets`.
+COPY --from=build --exclude=client/assets/content/assets/ /app/dist /usr/share/caddy
 
-# set UID and GID for oeaw smb defaults
-RUN groupmod -o -g 101 node
-RUN usermod -u 101 -g 101 node
-
-USER node
-
-COPY --from=base --chown=node:node /app/node_modules ./node_modules
-COPY --from=build --chown=node:node /app/dist ./
-
-ENV NODE_ENV=production
-ENV HOST=0.0.0.0
-ENV PORT=3000
+COPY --chown=caddy:caddy Caddyfile /etc/caddy/Caddyfile
 
 EXPOSE 3000
 
-CMD [ "node", "./server/entry.mjs" ]
+CMD ["caddy", "run", "--config", "/etc/caddy/Caddyfile"]

@@ -1,0 +1,17 @@
+---
+import AppLink from "@/components/link.astro";
+import { getLinkProps, type LinkSchema } from "@/lib/content/utils/get-link-props";
+
+interface Props {
+	class?: string;
+	item: LinkSchema;
+}
+
+const { item, ...rest } = Astro.props;
+
+const linkProps = getLinkProps(item);
+---
+
+<AppLink {...rest} {...linkProps}>
+	<slot />
+</AppLink>

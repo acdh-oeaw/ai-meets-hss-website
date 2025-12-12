@@ -4,64 +4,90 @@
       "discriminant": "link",
       "value": {
         "label": "Home",
-        "href": "/"
+				"link": {
+					"discriminant": "external",
+					"value": "/"
+				}
       }
     },
     {
       "discriminant": "menu",
       "value": {
         "label": "Programme",
-        "links": [
+        "items": [
           {
-            "discriminant": "page",
+            "discriminant": "link",
             "value": {
               "label": "Schedule",
-              "id": "programme"
+							"link": {
+								"discriminant": "pages",
+								"value": {
+									"id": "programme"
+								}
+							}
             }
           },
           {
             "discriminant": "link",
             "value": {
               "label": "Speakers",
-              "href": "/speakers"
+							"link": {
+								"discriminant": "pages",
+								"value": {
+									"id": "speakers"
+								}
+							}
             }
           },
           {
             "discriminant": "link",
             "value": {
               "label": "Posters & Demos",
-              "href": "/posters-and-live-demos"
+							"link": {
+								"discriminant": "pages",
+								"value": {
+									"id": "posters-and-live-demos"
+								}
+							}
             }
           }
         ]
       }
     },
     {
-      "discriminant": "page",
+      "discriminant": "link",
       "value": {
         "label": "Podiumsdiskussion",
-        "id": "discussants"
+				"link": {
+					"discriminant": "pages",
+					"value": {
+						"id": "discussants"
+					}
+				}
       }
     },
     {
       "discriminant": "link",
       "value": {
-        "label": "Registration",
-        "href": "/registration-closed"
-      }
-    },
-    {
-      "discriminant": "page",
-      "value": {
         "label": "Location",
-        "id": "location"
+				"link": {
+					"discriminant": "pages",
+					"value": {
+						"id": "location"
+					}
+				}
       }
     },
     {
-      "discriminant": "page",
+      "discriminant": "link",
       "value": {
         "label": "Organisation & Contact",
-        "id": "organisation"
+				"link": {
+					"discriminant": "pages",
+					"value": {
+						"id": "organisation"
+					}
+				}
       }
     }
   ]
