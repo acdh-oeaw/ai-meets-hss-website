@@ -21,8 +21,12 @@ const meta = await getMetadata(locale);
 const { description, robots, title } = Astro.props;
 
 const canonicalUrl = new URL(Astro.url.pathname, Astro.site);
-const openGraphImageUrl = createFullUrl({ baseUrl: Astro.site, pathname: "/opengraph-image.png" });
-const sitemapUrl = createHref({ pathname: "/sitemap-index.xml" });
+const openGraphImageUrl = createFullUrl({
+	pathname: `/${localeToPrefix[locale]}/opengraph-image.png`,
+});
+const sitemapUrl = createHref({
+	pathname: `/${localeToPrefix[locale]}/sitemap-index.xml`,
+});
 
 const jsonLd: WithContext<WebSite> = {
 	"@context": "https://schema.org",
@@ -45,10 +49,7 @@ const pathname = getUnprefixedPathname(Astro.url.pathname);
 	locales.map((locale) => {
 		return (
 			<link
-				href={createFullUrl({
-					baseUrl: Astro.site,
-					pathname: `/${localeToPrefix[locale]}${pathname}`,
-				})}
+				href={createFullUrl({ pathname: `/${localeToPrefix[locale]}${pathname}` })}
 				hreflang={locale}
 				rel="alternate"
 			/>
@@ -58,10 +59,7 @@ const pathname = getUnprefixedPathname(Astro.url.pathname);
 {
 	pathname === "/" ? (
 		<link
-			href={createFullUrl({
-				baseUrl: Astro.site,
-				pathname: "/",
-			})}
+			href={createFullUrl({ pathname: `/${localeToPrefix[locale]}/` })}
 			hreflang="x-default"
 			rel="alternate"
 		/>
