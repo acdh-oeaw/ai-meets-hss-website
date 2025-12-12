@@ -111,7 +111,9 @@ jobs:
           labels: "${{ steps.meta.outputs.labels }}"
           build-args: |
             "PUBLIC_APP_BASE_PATH=${{ vars.PUBLIC_APP_BASE_PATH }}"
-            "PUBLIC_APP_BASE_URL=${{ needs.vars.outputs.public_url }}"
+            # "PUBLIC_APP_BASE_URL=${{ needs.vars.outputs.public_url }}"
+            # explicitly set app base url to www.oeaw.ac.at
+            "PUBLIC_APP_BASE_URL=${{ vars.PUBLIC_APP_BASE_URL }}"
             "PUBLIC_BOTS=${{ vars.PUBLIC_BOTS }}"
             "PUBLIC_GOOGLE_SITE_VERIFICATION=${{ vars.PUBLIC_GOOGLE_SITE_VERIFICATION }}"
             "PUBLIC_IMPRINT_SERVICE_BASE_URL=${{ vars.PUBLIC_IMPRINT_SERVICE_BASE_URL }}"
