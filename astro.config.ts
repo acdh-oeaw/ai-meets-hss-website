@@ -1,6 +1,7 @@
 import * as path from "node:path";
 
 import mdx from "@astrojs/mdx";
+import node from "@astrojs/node";
 import sitemap from "@astrojs/sitemap";
 import svelte from "@astrojs/svelte";
 import tailwindcss from "@tailwindcss/vite";
@@ -15,6 +16,9 @@ import { localeToPrefix } from "./src/lib/i18n/routing";
 const env = loadEnv(process.env.NODE_ENV ?? "development", process.cwd(), "");
 
 export default defineConfig({
+	adapter: node({
+		mode: "standalone",
+	}),
 	base: env.PUBLIC_APP_BASE_PATH,
 	experimental: {
 		fonts: [
