@@ -5,7 +5,7 @@ import Link from "@/components/link.astro";
 import { getTranslations } from "@/lib/i18n/get-translations";
 import { createHref } from "@/lib/navigation/create-href";
 import type { NavigationLink } from "@/lib/navigation/navigation";
-import logo from "~/public/images/logo-oeaw.png";
+import logo from "~/public/assets/images/logo-oeaw.png";
 
 const { locale } = Astro.locals;
 const t = await getTranslations(locale, "DefaultFooter");
