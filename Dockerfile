@@ -53,10 +53,30 @@ FROM caddy:2-alpine AS serve
 
 WORKDIR /usr/share/caddy
 
-# exclude assets which should have been optimized with `astro:assets`.
-COPY --from=build --exclude=assets/content/assets/ /app/dist /usr/share/caddy/conference/ai-meets-hss
+ARG PUBLIC_APP_BASE_PATH
 
-COPY Caddyfile /etc/caddy/Caddyfile
+# exclude assets which should have been optimized with `astro:assets`.
+COPY --from=build --exclude=assets/content/assets/ /app/dist /usr/share/caddy
+
+RUN cat > /etc/caddy/Caddyfile <<EOF
+:3000 {
+	root * /usr/share/caddy
+
+	handle_path ${PUBLIC_APP_BASE_PATH}* {
+		redir / ${PUBLIC_APP_BASE_PATH}/en/ 302
+
+		header /_astro/* Cache-Control "public, max-age=31536000, immutable"
+
+		try_files {path} {path}/
+		file_server
+	}
+
+	handle_errors {
+		rewrite * /{err.status_code}.html
+		file_server
+	}
+}
+EOF
 
 EXPOSE 3000
 

@@ -1,7 +1,0 @@
-:3000 {
-	root * /usr/share/caddy
-
-	redir /conference/ai-meets-hss/ /conference/ai-meets-hss/en/ 302
-
-	file_server
-}
