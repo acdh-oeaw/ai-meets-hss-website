@@ -54,8 +54,10 @@ FROM caddy:2-alpine AS serve
 WORKDIR /usr/share/caddy
 
 # exclude assets which should have been optimized with `astro:assets`.
-COPY --from=build --exclude=conference/ai-meets-hss/assets/content/assets/ /app/dist /usr/share/caddy/conference/ai-meets-hss
+COPY --from=build --exclude=assets/content/assets/ /app/dist /usr/share/caddy/conference/ai-meets-hss
+
+COPY Caddyfile /etc/caddy/Caddyfile
 
 EXPOSE 3000
 
-CMD ["caddy", "file-server", "--listen", ":3000"]
+CMD ["caddy", "run", "--config", "/etc/caddy/Caddyfile"]
