@@ -4,10 +4,8 @@ import { ClientRouter } from "astro:transitions";
 
 import { env } from "@/config/env.config";
 import AnalyticsScript from "@/lib/analytics/analytics-script.astro";
-import { localeToPrefix } from "@/lib/i18n/routing";
 import { createHref } from "@/lib/navigation/create-href";
-
-const { locale } = Astro.locals;
+import { withBasePath } from "@/lib/navigation/with-base-path";
 
 const matomoBaseUrl = env.PUBLIC_MATOMO_BASE_URL;
 const matomoId = env.PUBLIC_MATOMO_ID;
@@ -20,19 +18,19 @@ const googleSiteVerification = env.PUBLIC_GOOGLE_SITE_VERIFICATION;
 	<meta content="light" name="color-scheme" />
 
 	<link
-		href={createHref({ pathname: `/${localeToPrefix[locale]}/favicon.ico` })}
+		href={createHref({ pathname: withBasePath("/favicon.ico") })}
 		rel="icon"
 		sizes="32x32"
 		type="image/x-icon"
 	/>
 	<link
-		href={createHref({ pathname: `/${localeToPrefix[locale]}/icon.svg` })}
+		href={createHref({ pathname: withBasePath("/icon.svg") })}
 		rel="icon"
 		sizes="any"
 		type="image/svg+xml"
 	/>
 	<link
-		href={createHref({ pathname: `/${localeToPrefix[locale]}/apple-icon.png` })}
+		href={createHref({ pathname: withBasePath("/apple-icon.png") })}
 		rel="apple-touch-icon"
 		sizes="180x180"
 		type="image/png"
