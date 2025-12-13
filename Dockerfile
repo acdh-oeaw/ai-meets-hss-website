@@ -5,8 +5,8 @@
 # using alpine base image to avoid `sharp` memory leaks.
 # @see https://sharp.pixelplumbing.com/install#linux-memory-allocator
 
-# base
-FROM node:24-alpine AS base
+# build
+FROM node:24-alpine AS build
 
 RUN corepack enable
 
@@ -21,13 +21,7 @@ COPY --chown=node:node .npmrc package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 ENV CI=true
 ENV SKIP_INSTALL_SIMPLE_GIT_HOOKS=1
 
-RUN pnpm fetch --prod
-RUN pnpm install --frozen-lockfile --ignore-scripts --offline --prod
-
-# build
-FROM base AS build
-
-RUN pnpm fetch --dev
+RUN pnpm fetch
 
 COPY --chown=node:node ./ ./
 
@@ -55,21 +49,13 @@ ENV NODE_ENV=production
 RUN pnpm run build
 
 # serve
-FROM node:24-alpine AS serve
+FROM caddy:2-alpine AS serve
 
-RUN mkdir /app && chown -R node:node /app
-WORKDIR /app
+WORKDIR /usr/share/caddy
 
-USER node
-
-COPY --from=base --chown=node:node /app/node_modules ./node_modules
 # exclude assets which should have been optimized with `astro:assets`.
-COPY --from=build --chown=node:node --exclude=client/assets/content/assets/ /app/dist ./
-
-ENV NODE_ENV=production
-ENV HOST=0.0.0.0
-ENV PORT=3000
+COPY --from=build --exclude=conference/ai-meets-hss/assets/content/assets/ /app/dist /usr/share/caddy/conference/ai-meets-hss
 
 EXPOSE 3000
 
-CMD [ "node", "./server/entry.mjs" ]
+CMD ["caddy", "file-server", "--listen", ":3000"]
