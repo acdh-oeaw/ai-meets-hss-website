@@ -1,19 +1,20 @@
-/* eslint-disable no-restricted-syntax */
-
+import { existsSync } from "node:fs";
 import { join } from "node:path";
+import { loadEnvFile } from "node:process";
 
 import { isNonEmptyString } from "@acdh-oeaw/lib";
 import { defineConfig, devices, type PlaywrightTestConfig } from "@playwright/test";
-import { config as dotenv } from "dotenv";
-import { expand } from "dotenv-expand";
 import isCI from "is-in-ci";
 
 /**
- * Reading `.env` files here instead of using `dotenv-cli` so environment variables are
- * available to the vs code plugin as well.
+ * Load test environment files here so they are also available to the VS Code extension.
+ * Existing environment variables and earlier files take precedence.
  */
 for (const envFilePath of [".env.test.local", ".env.local", ".env.test", ".env"]) {
-	expand(dotenv({ path: join(process.cwd(), envFilePath), quiet: true }));
+	const filePath = join(process.cwd(), envFilePath);
+	if (existsSync(filePath)) {
+		loadEnvFile(filePath);
+	}
 }
 
 function getConfig():

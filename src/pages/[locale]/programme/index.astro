@@ -48,26 +48,24 @@ const events = await client.collections.events.all();
 	<DocumentBody>
 		<DefaultLayout>
 			<div class="relative w-full border-b border-stroke-weak">
-				{
-					image != null && image.src != null ? (
-						<figure class="absolute inset-0 -z-10 size-full overflow-hidden">
-							<Image
-								alt=""
-								class="size-full object-cover"
-								fetchpriority="high"
-								layout="full-width"
-								loading="eager"
-								src={image.src}
-							/>
-							<div class="absolute inset-0 size-full bg-black/60" />
-							{image.caption ? (
-								<figcaption class="absolute right-2 bottom-1.5 z-10 text-xs font-medium text-white/50">
-									{image.caption}
-								</figcaption>
-							) : null}
-						</figure>
-					) : null
-				}
+				{image != null && image.src != null ? (
+					<figure class="absolute inset-0 -z-10 size-full overflow-hidden">
+						<Image
+							alt=""
+							class="size-full object-cover"
+							fetchpriority="high"
+							layout="full-width"
+							loading="eager"
+							src={image.src}
+						/>
+						<div class="absolute inset-0 size-full bg-black/60" />
+						{image.caption ? (
+							<figcaption class="absolute right-2 bottom-1.5 z-10 text-xs font-medium text-white/50">
+								{image.caption}
+							</figcaption>
+						) : null}
+					</figure>
+				) : null}
 				<section class="container richtext max-w-(--breakpoint-md) px-4 py-6 xs:py-16 sm:px-8">
 					<h1
 						class="py-8 text-3xl font-extrabold tracking-tight lowercase xs:text-6xl"
@@ -85,60 +83,58 @@ const events = await client.collections.events.all();
 					class="grid grid-cols-[repeat(auto-fill,minmax(min(100%,18rem),1fr))] gap-6"
 					role="list"
 				>
-					{
-						events.map((event) => {
-							const { metadata, id } = event;
+					{events.map((event) => {
+						const { metadata, id } = event;
 
-							const { date, image, title, summary } = metadata;
+						const { date, image, title, summary } = metadata;
 
-							const href = `/programme/${id}`;
+						const href = `/programme/${id}`;
 
-							return (
-								<li>
-									<article class="relative overflow-hidden rounded-sm border border-stroke-weak shadow-md transition hover:shadow-xl">
-										<div class="relative aspect-video border-b border-stroke-weak">
-											{image?.src != null ? (
-												<Fragment>
-													<img
-														alt=""
-														class="absolute inset-0 size-full object-cover"
-														loading="lazy"
-														src={image.src}
-													/>
-													<div class="absolute inset-0 size-full bg-black/30" />
-												</Fragment>
-											) : null}
-										</div>
-										<div class="flex flex-col gap-y-2 p-6 text-sm">
-											<h2 class="text-lg font-semibold text-text-strong">
-												<Link class="after:absolute after:inset-0" href={href}>
-													{title}
-												</Link>
-											</h2>
-											<dl class="flex flex-col gap-y-1.5 text-text-weak">
-												<div class="leading-snug">
-													<dt class="text-xs font-semibold tracking-wider text-neutral-500 uppercase">
-														{t("date")}
-													</dt>
-													<dd class="font-medium">
-														<time datetime={date}>
-															{formatter.dateTime(new Date(date), { dateStyle: "long" })}
-														</time>
-													</dd>
-												</div>
-												<div class="leading-snug">
-													<dt class="text-xs font-semibold tracking-wider text-neutral-500 uppercase">
-														{t("summary")}
-													</dt>
-													<dd class="font-medium">{summary}</dd>
-												</div>
-											</dl>
-										</div>
-									</article>
-								</li>
-							);
-						})
-					}
+						return (
+							<li>
+								<article class="relative overflow-hidden rounded-sm border border-stroke-weak shadow-md transition hover:shadow-xl">
+									<div class="relative aspect-video border-b border-stroke-weak">
+										{image?.src != null ? (
+											<Fragment>
+												<img
+													alt=""
+													class="absolute inset-0 size-full object-cover"
+													loading="lazy"
+													src={image.src}
+												/>
+												<div class="absolute inset-0 size-full bg-black/30" />
+											</Fragment>
+										) : null}
+									</div>
+									<div class="flex flex-col gap-y-2 p-6 text-sm">
+										<h2 class="text-lg font-semibold text-text-strong">
+											<Link class="after:absolute after:inset-0" href={href}>
+												{title}
+											</Link>
+										</h2>
+										<dl class="flex flex-col gap-y-1.5 text-text-weak">
+											<div class="leading-snug">
+												<dt class="text-xs font-semibold tracking-wider text-neutral-500 uppercase">
+													{t("date")}
+												</dt>
+												<dd class="font-medium">
+													<time datetime={date}>
+														{formatter.dateTime(new Date(date), { dateStyle: "long" })}
+													</time>
+												</dd>
+											</div>
+											<div class="leading-snug">
+												<dt class="text-xs font-semibold tracking-wider text-neutral-500 uppercase">
+													{t("summary")}
+												</dt>
+												<dd class="font-medium">{summary}</dd>
+											</div>
+										</dl>
+									</div>
+								</article>
+							</li>
+						);
+					})}
 				</ul>
 			</section>
 		</DefaultLayout>

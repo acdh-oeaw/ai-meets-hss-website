@@ -51,21 +51,19 @@ const Content = page.content;
 	<DocumentBody>
 		<DefaultLayout>
 			<div class="relative w-full border-b border-stroke-weak">
-				{
-					image != null ? (
-						<figure class="absolute inset-0 -z-10 size-full overflow-hidden">
-							<Image
-								alt=""
-								class="size-full object-cover"
-								fetchpriority="high"
-								layout="full-width"
-								loading="eager"
-								src={image}
-							/>
-							<div class="absolute inset-0 size-full bg-black/60" />
-						</figure>
-					) : null
-				}
+				{image != null ? (
+					<figure class="absolute inset-0 -z-10 size-full overflow-hidden">
+						<Image
+							alt=""
+							class="size-full object-cover"
+							fetchpriority="high"
+							layout="full-width"
+							loading="eager"
+							src={image}
+						/>
+						<div class="absolute inset-0 size-full bg-black/60" />
+					</figure>
+				) : null}
 				<section class="container richtext max-w-(--breakpoint-md) px-4 py-6 xs:py-16 sm:px-8">
 					<h1
 						class="py-8 text-3xl font-extrabold tracking-tight lowercase xs:text-6xl"

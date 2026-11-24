@@ -9,10 +9,10 @@ import type {
 	NavigationSeparator,
 } from "@/lib/navigation/navigation";
 
-// eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
+// oxlint-disable-next-line typescript/explicit-module-boundary-types
 export async function createClient(locale: IntlLanguage) {
 	const singleton = await import(`@content/${locale}-navigation/index.js`).then((module) => {
-		// eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+		// oxlint-disable-next-line typescript/no-unsafe-member-access
 		return module.default as typeof en;
 	});
 
@@ -86,7 +86,7 @@ export async function createClient(locale: IntlLanguage) {
 		get() {
 			return Promise.resolve(navigation);
 		},
-		// eslint-disable-next-line @typescript-eslint/no-explicit-any
+		// oxlint-disable-next-line typescript/no-explicit-any
 	} satisfies SingletonClient<any>;
 
 	return client;

@@ -5,7 +5,7 @@ import type messages from "~/messages/en.json";
 type Messages = typeof messages;
 type Metadata = typeof metadata;
 
-// eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
+// oxlint-disable-next-line typescript/explicit-module-boundary-types
 export async function getIntlMessages(locale: IntlLocale) {
 	const language = getIntlLanguage(locale);
 

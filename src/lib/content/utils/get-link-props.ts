@@ -5,7 +5,7 @@ import { createHref } from "@/lib/navigation/create-href";
 
 export type LinkSchema = ValueForReading<ReturnType<typeof createLinkSchema>>;
 
-// eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
+// oxlint-disable-next-line typescript/explicit-module-boundary-types
 export function getLinkProps(params: LinkSchema) {
 	switch (params.discriminant) {
 		case "download": {

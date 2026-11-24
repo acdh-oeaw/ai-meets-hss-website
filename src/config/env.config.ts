@@ -1,18 +1,15 @@
-/* eslint-disable no-restricted-syntax */
-
-import { addTrailingSlash, err, isErr, ok, removeTrailingSlash } from "@acdh-oeaw/lib";
+import { addTrailingSlash, removeTrailingSlash } from "@acdh-oeaw/lib";
 import { createEnv, ValidationError } from "@acdh-oeaw/validate-env/astro";
 import * as v from "valibot";
 
 const environment =
-	// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
 	import.meta.env === undefined
 		? process.env
 		: import.meta.env.SSR
 			? Object.assign({}, process.env, import.meta.env)
 			: import.meta.env;
 
-const result = createEnv({
+export const env = createEnv({
 	schemas: {
 		system(environment) {
 			const schema = v.object({
@@ -22,14 +19,12 @@ const result = createEnv({
 			const result = v.safeParse(schema, environment);
 
 			if (!result.success) {
-				return err(
-					new ValidationError(
-						`Invalid or missing environment variables.\n${v.summarize(result.issues)}`,
-					),
+				throw new ValidationError(
+					`Invalid or missing environment variables.\n${v.summarize(result.issues)}`,
 				);
 			}
 
-			return ok(result.output);
+			return result.output;
 		},
 		private(environment) {
 			const schema = v.object({
@@ -39,14 +34,12 @@ const result = createEnv({
 			const result = v.safeParse(schema, environment);
 
 			if (!result.success) {
-				return err(
-					new ValidationError(
-						`Invalid or missing environment variables.\n${v.summarize(result.issues)}`,
-					),
+				throw new ValidationError(
+					`Invalid or missing environment variables.\n${v.summarize(result.issues)}`,
 				);
 			}
 
-			return ok(result.output);
+			return result.output;
 		},
 		public(environment) {
 			const schema = v.object({
@@ -79,14 +72,12 @@ const result = createEnv({
 			const result = v.safeParse(schema, environment);
 
 			if (!result.success) {
-				return err(
-					new ValidationError(
-						`Invalid or missing environment variables.\n${v.summarize(result.issues)}`,
-					),
+				throw new ValidationError(
+					`Invalid or missing environment variables.\n${v.summarize(result.issues)}`,
 				);
 			}
 
-			return ok(result.output);
+			return result.output;
 		},
 	},
 	environment,
@@ -95,10 +86,3 @@ const result = createEnv({
 		environment.ENV_VALIDATION,
 	),
 });
-
-if (isErr(result)) {
-	delete result.error.stack;
-	throw result.error;
-}
-
-export const env = result.value;

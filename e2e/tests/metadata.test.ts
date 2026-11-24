@@ -116,7 +116,6 @@ test.describe("metadata", () => {
 
 			const json = await indexPage.page.locator('script[type="application/ld+json"]').textContent();
 
-			// eslint-disable-next-line playwright/prefer-web-first-assertions
 			expect(json).toBe(
 				JSON.stringify({
 					"@context": "https://schema.org",

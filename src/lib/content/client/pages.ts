@@ -4,10 +4,10 @@ import type en from "@content/en-pages";
 import type { CollectionClient } from "@/lib/content/types";
 import type { IntlLanguage } from "@/lib/i18n/locales";
 
-// eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
+// oxlint-disable-next-line typescript/explicit-module-boundary-types
 export async function createClient(locale: IntlLanguage) {
 	const collection = await import(`@content/${locale}-pages/index.js`).then((module) => {
-		// eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+		// oxlint-disable-next-line typescript/no-unsafe-member-access
 		return module.default as typeof en;
 	});
 
@@ -17,7 +17,7 @@ export async function createClient(locale: IntlLanguage) {
 		.map((entry) => {
 			return entry.document;
 		})
-		// eslint-disable-next-line unicorn/no-array-sort
+		// oxlint-disable-next-line unicorn/no-array-sort
 		.sort((a, z) => {
 			return a.metadata.title.localeCompare(z.metadata.title);
 		});
@@ -39,7 +39,7 @@ export async function createClient(locale: IntlLanguage) {
 		get(id: (typeof ids)[number]) {
 			return Promise.resolve(byId.get(id) ?? null);
 		},
-		// eslint-disable-next-line @typescript-eslint/no-explicit-any
+		// oxlint-disable-next-line typescript/no-explicit-any
 	} satisfies CollectionClient<any>;
 
 	return client;

@@ -2,7 +2,6 @@
 	"$schema": "https://www.schemastore.org/tsconfig",
 	"extends": ["astro/tsconfigs/base", "@acdh-oeaw/tsconfig"],
 	"compilerOptions": {
-		"baseUrl": ".",
 		"paths": {
 			"@/*": ["./src/*"],
 			"~/*": ["./*"],

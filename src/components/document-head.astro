@@ -43,11 +43,9 @@ const googleSiteVerification = env.PUBLIC_GOOGLE_SITE_VERIFICATION;
 
 	<slot />
 
-	{
-		googleSiteVerification != null ? (
-			<meta content={googleSiteVerification} name="google-site-verification" />
-		) : null
-	}
+	{googleSiteVerification != null ? (
+		<meta content={googleSiteVerification} name="google-site-verification" />
+	) : null}
 
 	{matomoBaseUrl && matomoId ? <AnalyticsScript baseUrl={matomoBaseUrl} id={matomoId} /> : null}
 

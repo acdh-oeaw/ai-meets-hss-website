@@ -46,26 +46,22 @@ const pathname = getUnprefixedPathname(Astro.url.pathname);
 
 <link href={canonicalUrl} rel="canonical" />
 
-{
-	locales.map((locale) => {
-		return (
-			<link
-				href={createFullUrl({ pathname: withBasePath(`/${localeToPrefix[locale]}${pathname}`) })}
-				hreflang={locale}
-				rel="alternate"
-			/>
-		);
-	})
-}
-{
-	pathname === "/" ? (
+{locales.map((locale) => {
+	return (
 		<link
-			href={createFullUrl({ pathname: withBasePath(`/${localeToPrefix[locale]}/`) })}
-			hreflang="x-default"
+			href={createFullUrl({ pathname: withBasePath(`/${localeToPrefix[locale]}${pathname}`) })}
+			hreflang={locale}
 			rel="alternate"
 		/>
-	) : null
-}
+	);
+})}
+{pathname === "/" ? (
+	<link
+		href={createFullUrl({ pathname: withBasePath(`/${localeToPrefix[locale]}/`) })}
+		hreflang="x-default"
+		rel="alternate"
+	/>
+) : null}
 
 <link href={sitemapUrl} rel="sitemap" />
 

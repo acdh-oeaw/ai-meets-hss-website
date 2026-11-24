@@ -4,7 +4,7 @@
 	"editor.codeActionsOnSave": {
 		"source.fixAll": "explicit"
 	},
-	"editor.defaultFormatter": "esbenp.prettier-vscode",
+	"editor.defaultFormatter": "oxc.oxc-vscode",
 	"editor.detectIndentation": false,
 	"editor.formatOnSave": true,
 	"editor.inlayHints.enabled": "offUnlessPressed",
@@ -14,11 +14,6 @@
 	},
 	"editor.rulers": [100],
 	"editor.stickyScroll.enabled": true,
-	"eslint.enable": true,
-	"eslint.options": {
-		"flags": ["unstable_native_nodejs_ts_config"]
-	},
-	"eslint.validate": ["astro", "javascript", "svelte", "typescript", "typescriptreact"],
 	"files.associations": {
 		"*.css": "tailwindcss"
 	},
@@ -41,7 +36,6 @@
 	"i18n-ally.tabStyle": "tab",
 	"less.validate": false,
 	"mdx.server.enable": true,
-	"prettier.documentSelectors": ["**/*.astro", "**/*.svelte"],
 	"scss.validate": false,
 	"search.exclude": {
 		".astro/**": true,
@@ -69,6 +63,6 @@
 		"editor.wordWrap": "on"
 	},
 	"[svelte]": {
-		"editor.defaultFormatter": "svelte.svelte-vscode"
+		"editor.defaultFormatter": "oxc.oxc-vscode"
 	}
 }

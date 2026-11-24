@@ -1,0 +1,16 @@
+pre-commit:
+  commands:
+    lint-code:
+      priority: 1
+      glob: "*.{js,jsx,mjs,cjs,ts,tsx,mts,cts,astro,svelte}"
+      run: pnpm exec oxlint --type-aware --fix {staged_files}
+      stage_fixed: true
+    lint-styles:
+      priority: 2
+      glob: "*.{astro,css}"
+      run: pnpm exec stylelint --cache --fix {staged_files}
+      stage_fixed: true
+    format:
+      priority: 3
+      run: pnpm exec oxfmt --write --no-error-on-unmatched-pattern {staged_files}
+      stage_fixed: true
