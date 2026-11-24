@@ -23,9 +23,9 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
 
-      - uses: dorny/paths-filter@v3
+      - uses: dorny/paths-filter@v4
         id: filter
         with:
           filters: |
@@ -54,19 +54,17 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
 
-      - name: Install pnpm
-        uses: pnpm/action-setup@v4
-
-      - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v6
+      - name: Set up pnpm and Node.js ${{ matrix.node-version }}
+        uses: pnpm/setup@v3
         with:
-          node-version: ${{ matrix.node-version }}
-          cache: "pnpm"
+          runtime: node@${{ matrix.node-version }}
+          cache: true
+          install: false
 
       - name: Cache astro build artefacts
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: node_modules/.astro/
           key: ${{ runner.os }}-astro-${{ matrix.node-version }}-${{ github.run_id }}
@@ -93,7 +91,7 @@ jobs:
       #     echo "PLAYWRIGHT_VERSION=$PLAYWRIGHT_VERSION" >> $GITHUB_ENV
 
       # - name: Cache playwright browsers
-      #   uses: actions/cache@v4
+      #   uses: actions/cache@v6
       #   id: cache-playwright-browsers
       #   with:
       #     path: "~/.cache/ms-playwright"
@@ -112,7 +110,7 @@ jobs:
       # - name: Run e2e tests
       #   run: pnpm run test:e2e
 
-      # - uses: actions/upload-artifact@v5
+      # - uses: actions/upload-artifact@v7
       #   if: ${{ !cancelled() }}
       #   with:
       #     name: playwright-report
