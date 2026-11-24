@@ -5,6 +5,7 @@ import Link from "@/components/link.astro";
 import { getTranslations } from "@/lib/i18n/get-translations";
 import { createHref } from "@/lib/navigation/create-href";
 import type { NavigationLink } from "@/lib/navigation/navigation";
+import acdhLogo from "~/public/assets/images/logo-acdh-black-with-text.svg";
 import logo from "~/public/assets/images/logo-oeaw.png";
 
 const { locale } = Astro.locals;
@@ -31,6 +32,12 @@ const links = {
 				<Image alt="" class="h-14 w-auto shrink-0" src={logo} />
 				<span class="sr-only">{links.home.label}</span>
 			</Link>
+			<a
+				class="-ml-2 inline-block shrink-0 rounded-xs p-2 focus-outline"
+				href="https://www.oeaw.ac.at/acdh/"
+			>
+				<Image alt="ACDH-CH" class="h-14 w-auto shrink-0" src={acdhLogo} />
+			</a>
 		</div>
 
 		<div class="flex flex-col gap-y-8">
