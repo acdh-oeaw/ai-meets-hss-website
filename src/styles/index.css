@@ -102,8 +102,8 @@
 		background-color: var(--color-background-base);
 		color: var(--color-text-strong);
 		font-family: var(--font-body);
-		overflow-wrap: break-word;
 		font-synthesis: none;
+		overflow-wrap: break-word;
 		text-rendering: optimizeLegibility;
 		-moz-osx-font-smoothing: grayscale;
 		-webkit-font-smoothing: antialiased;
@@ -156,10 +156,10 @@
 		*,
 		*::after,
 		*::before {
+			scroll-behavior: auto !important;
 			transition-duration: 0.01ms !important;
 			animation-duration: 0.01ms !important;
 			animation-iteration-count: 1 !important;
-			scroll-behavior: auto !important;
 		}
 	}
 
@@ -442,10 +442,10 @@
 		&:where(kbd) {
 			padding: 0.1875em 0.375em;
 			border-radius: 0.3125rem;
-			color: var(--richtext-kbd);
 			box-shadow:
 				0 0 0 1px --alpha(var(--richtext-kbd-shadows) / 10%),
 				0 3px 0 --alpha(var(--richtext-kbd-shadows) / 10%);
+			color: var(--richtext-kbd);
 			font-weight: 500;
 			font-size: 0.875em;
 			font-family: inherit;

@@ -1,14 +1,18 @@
-onlyBuiltDependencies:
-  - '@parcel/watcher'
-  - '@tailwindcss/oxide'
-  - esbuild
-  - node
-  - sharp
-  - simple-git-hooks
-  - unrs-resolver
+allowBuilds:
+  '@parcel/watcher': true
+  esbuild: true
+  sharp: true
+  lefthook: true
 
-# https://pnpm.io/settings#shellemulator
+autoDedupe: true
+
+engineStrict: true
+
+lockfile:
+  includeResolutionSettings: true
+
+minimumReleaseAge: 720
+
+saveTypes: true
+
 shellEmulator: true
-
-# https://pnpm.io/settings#strictdepbuilds
-strictDepBuilds: true

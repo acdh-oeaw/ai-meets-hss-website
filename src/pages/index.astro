@@ -3,6 +3,6 @@ import { defaultLocale } from "@/lib/i18n/locales";
 import { localeToPrefix } from "@/lib/i18n/routing";
 import { withBasePath } from "@/lib/navigation/with-base-path";
 
-// eslint-disable-next-line unicorn/prefer-module
+// oxlint-disable-next-line unicorn/prefer-module
 return Astro.redirect(withBasePath(`/${localeToPrefix[defaultLocale]}`), 307);
 ---

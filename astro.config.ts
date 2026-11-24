@@ -11,21 +11,18 @@ import { loadEnv } from "vite";
 import { defaultLocale } from "./src/lib/i18n/locales";
 import { localeToPrefix } from "./src/lib/i18n/routing";
 
-// eslint-disable-next-line no-restricted-syntax
 const env = loadEnv(process.env.NODE_ENV ?? "development", process.cwd(), "");
 
 export default defineConfig({
 	base: env.PUBLIC_APP_BASE_PATH,
-	experimental: {
-		fonts: [
-			{
-				provider: fontProviders.google(),
-				name: "Inter",
-				cssVariable: "--_font-body",
-				weights: ["100 900"],
-			},
-		],
-	},
+	fonts: [
+		{
+			provider: fontProviders.google(),
+			name: "Inter",
+			cssVariable: "--_font-body",
+			weights: ["100 900"],
+		},
+	],
 	integrations: [
 		icon({
 			iconDir: "./src/assets/icons",
@@ -54,6 +51,11 @@ export default defineConfig({
 			},
 		}),
 	],
+	security: {
+		allowedDomains: env.PUBLIC_APP_BASE_URL
+			? [{ hostname: new URL(env.PUBLIC_APP_BASE_URL).hostname }]
+			: [],
+	},
 	server: {
 		port: 3000,
 	},

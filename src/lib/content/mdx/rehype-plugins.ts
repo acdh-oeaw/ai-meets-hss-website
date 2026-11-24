@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/explicit-module-boundary-types */
+/* oxlint-disable typescript/explicit-module-boundary-types */
 
 import { withCustomHeadingIds, withImageImports, withImageSizes } from "@acdh-oeaw/mdx-lib";
 import withHeadingIds from "rehype-slug";

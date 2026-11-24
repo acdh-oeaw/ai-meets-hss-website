@@ -39,24 +39,22 @@ const links = {
 					class="-mx-2 flex flex-wrap items-center gap-x-2 gap-y-3 text-sm text-text-weak"
 					role="list"
 				>
-					{
-						Object.entries(links).map(([id, link]) => {
-							if (id === "home") {
-								return null;
-							}
+					{Object.entries(links).map(([id, link]) => {
+						if (id === "home") {
+							return null;
+						}
 
-							return (
-								<li>
-									<Link
-										class="rounded-xs p-2 underline decoration-dotted underline-offset-4 transition hover:decoration-solid focus-visible:text-text-strong focus-visible:outline-offset-4"
-										href={link.href}
-									>
-										{link.label}
-									</Link>
-								</li>
-							);
-						})
-					}
+						return (
+							<li>
+								<Link
+									class="rounded-xs p-2 underline decoration-dotted underline-offset-4 transition hover:decoration-solid focus-visible:text-text-strong focus-visible:outline-offset-4"
+									href={link.href}
+								>
+									{link.label}
+								</Link>
+							</li>
+						);
+					})}
 				</ul>
 			</nav>
 

@@ -5,7 +5,7 @@ import { createClient as createPagesClient } from "@/lib/content/client/pages";
 import type { Client } from "@/lib/content/types";
 import type { IntlLanguage } from "@/lib/i18n/locales";
 
-// eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
+// oxlint-disable-next-line typescript/explicit-module-boundary-types
 export async function createClient(locale: IntlLanguage) {
 	const [pages, events, indexPage, navigation] = await Promise.all([
 		createPagesClient(locale),

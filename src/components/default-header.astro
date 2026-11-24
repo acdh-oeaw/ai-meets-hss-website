@@ -21,97 +21,13 @@ const navigation = await client.singletons.navigation.get();
 	<div class="container flex flex-wrap items-center justify-between gap-x-6 p-4 sm:px-8">
 		<nav aria-label={t("navigation.label")} class="flex flex-1 items-center gap-x-6">
 			<ul class="hidden flex-wrap items-center gap-x-4 lg:flex" role="list">
-				{
-					Object.values(navigation).map((item) => {
-						switch (item.type) {
-							case "link": {
-								return (
-									<li>
-										<Link
-											class="inline-flex rounded-xs p-2 font-medium text-text-weak focus-outline transition hover:text-text-strong focus-visible:text-text-strong focus-visible:outline-offset-4"
-											href={item.href}
-										>
-											{item.label}
-										</Link>
-									</li>
-								);
-							}
-
-							case "menu": {
-								return (
-									<li>
-										<NavigationMenu
-											className="group inline-flex items-center gap-x-2 rounded-xs p-2 font-medium text-text-weak focus-outline transition hover:text-text-strong focus-visible:text-text-strong focus-visible:outline-offset-4"
-											client:load="svelte"
-											label={item.label}
-										>
-											<Fragment slot="chevron">
-												<Icon
-													aria-hidden={true}
-													class="size-4 shrink-0 text-icon-neutral transition group-hover:text-text-strong group-focus-visible:text-text-strong"
-													name="lucide:chevron-down"
-												/>
-											</Fragment>
-
-											<div class="min-w-32 rounded-md border border-stroke-weak bg-background-base py-1 shadow-lg">
-												{Object.values(item.children).map((item) => {
-													switch (item.type) {
-														case "link": {
-															return (
-																<Link
-																	class="flex rounded-xs px-3 py-2 font-medium text-text-weak focus-outline transition hover:text-text-strong focus-visible:text-text-strong focus-visible:outline-offset-4"
-																	href={item.href}
-																>
-																	{item.label}
-																</Link>
-															);
-														}
-
-														case "separator": {
-															return <hr class="h-0 w-full border-t border-stroke-weak" />;
-														}
-
-														case "action": {
-															break;
-														}
-													}
-												})}
-											</div>
-										</NavigationMenu>
-									</li>
-								);
-							}
-
-							case "separator": {
-								return <li class="h-6 border-r border-stroke-weak" role="presentation" />;
-							}
-						}
-					})
-				}
-			</ul>
-
-			<div class="ml-auto flex items-center lg:hidden">
-				<MobileNavMenuToggle
-					className="flex rounded-xs p-2 font-medium text-text-weak focus-outline transition hover:text-text-strong focus-visible:text-text-strong focus-visible:outline-offset-4"
-					client:idle="svelte"
-				>
-					<Icon aria-hidden={true} class="size-5 shrink-0" name="lucide:menu" />
-					<span class="sr-only">{t("navigation.menu.open")}</span>
-				</MobileNavMenuToggle>
-			</div>
-		</nav>
-	</div>
-
-	<MobileNavMenu className="flex flex-col gap-y-4 px-4 pb-6 lg:hidden" client:idle="svelte">
-		<ul class="flex flex-col" role="list">
-			{
-				Object.values(navigation).map((item) => {
+				{Object.values(navigation).map((item) => {
 					switch (item.type) {
 						case "link": {
 							return (
 								<li>
 									<Link
-										class="flex rounded-xs p-2 font-medium text-text-weak focus-outline transition hover:text-text-strong focus-visible:text-text-strong focus-visible:outline-offset-4"
+										class="inline-flex rounded-xs p-2 font-medium text-text-weak focus-outline transition hover:text-text-strong focus-visible:text-text-strong focus-visible:outline-offset-4"
 										href={item.href}
 									>
 										{item.label}
@@ -123,38 +39,35 @@ const navigation = await client.singletons.navigation.get();
 						case "menu": {
 							return (
 								<li>
-									<details class="group">
-										<summary class="flex items-center justify-between rounded-xs p-2 font-medium text-text-weak focus-outline transition select-none hover:text-text-strong focus-visible:text-text-strong focus-visible:outline-offset-4">
-											{item.label}
+									<NavigationMenu
+										className="group inline-flex items-center gap-x-2 rounded-xs p-2 font-medium text-text-weak focus-outline transition hover:text-text-strong focus-visible:text-text-strong focus-visible:outline-offset-4"
+										client:load
+										label={item.label}
+									>
+										<Fragment slot="chevron">
 											<Icon
 												aria-hidden={true}
-												class="size-4 shrink-0 text-icon-neutral transition group-open:rotate-180 group-hover:text-text-strong group-focus-visible:text-text-strong"
+												class="size-4 shrink-0 text-icon-neutral transition group-hover:text-text-strong group-focus-visible:text-text-strong"
 												name="lucide:chevron-down"
 											/>
-										</summary>
-										<ul class="flex flex-col pl-4" role="list">
+										</Fragment>
+
+										<div class="min-w-32 rounded-md border border-stroke-weak bg-background-base py-1 shadow-lg">
 											{Object.values(item.children).map((item) => {
 												switch (item.type) {
 													case "link": {
 														return (
-															<li>
-																<Link
-																	class="flex rounded-xs p-2 font-medium text-text-weak focus-outline transition hover:text-text-strong focus-visible:text-text-strong focus-visible:outline-offset-4"
-																	href={item.href}
-																>
-																	{item.label}
-																</Link>
-															</li>
+															<Link
+																class="flex rounded-xs px-3 py-2 font-medium text-text-weak focus-outline transition hover:text-text-strong focus-visible:text-text-strong focus-visible:outline-offset-4"
+																href={item.href}
+															>
+																{item.label}
+															</Link>
 														);
 													}
 
 													case "separator": {
-														return (
-															<hr
-																class="h-0 w-full border-t border-stroke-weak"
-																role="presentation"
-															/>
-														);
+														return <hr class="h-0 w-full border-t border-stroke-weak" />;
 													}
 
 													case "action": {
@@ -162,18 +75,101 @@ const navigation = await client.singletons.navigation.get();
 													}
 												}
 											})}
-										</ul>
-									</details>
+										</div>
+									</NavigationMenu>
 								</li>
 							);
 						}
 
 						case "separator": {
-							return <li class="h-0 w-full border-t border-stroke-weak" role="presentation" />;
+							return <li class="h-6 border-r border-stroke-weak" role="presentation" />;
 						}
 					}
-				})
-			}
+				})}
+			</ul>
+
+			<div class="ml-auto flex items-center lg:hidden">
+				<MobileNavMenuToggle
+					className="flex rounded-xs p-2 font-medium text-text-weak focus-outline transition hover:text-text-strong focus-visible:text-text-strong focus-visible:outline-offset-4"
+					client:idle
+				>
+					<Icon aria-hidden={true} class="size-5 shrink-0" name="lucide:menu" />
+					<span class="sr-only">{t("navigation.menu.open")}</span>
+				</MobileNavMenuToggle>
+			</div>
+		</nav>
+	</div>
+
+	<MobileNavMenu className="flex flex-col gap-y-4 px-4 pb-6 lg:hidden" client:idle>
+		<ul class="flex flex-col" role="list">
+			{Object.values(navigation).map((item) => {
+				switch (item.type) {
+					case "link": {
+						return (
+							<li>
+								<Link
+									class="flex rounded-xs p-2 font-medium text-text-weak focus-outline transition hover:text-text-strong focus-visible:text-text-strong focus-visible:outline-offset-4"
+									href={item.href}
+								>
+									{item.label}
+								</Link>
+							</li>
+						);
+					}
+
+					case "menu": {
+						return (
+							<li>
+								<details class="group">
+									<summary class="flex items-center justify-between rounded-xs p-2 font-medium text-text-weak focus-outline transition select-none hover:text-text-strong focus-visible:text-text-strong focus-visible:outline-offset-4">
+										{item.label}
+										<Icon
+											aria-hidden={true}
+											class="size-4 shrink-0 text-icon-neutral transition group-open:rotate-180 group-hover:text-text-strong group-focus-visible:text-text-strong"
+											name="lucide:chevron-down"
+										/>
+									</summary>
+									<ul class="flex flex-col pl-4" role="list">
+										{Object.values(item.children).map((item) => {
+											switch (item.type) {
+												case "link": {
+													return (
+														<li>
+															<Link
+																class="flex rounded-xs p-2 font-medium text-text-weak focus-outline transition hover:text-text-strong focus-visible:text-text-strong focus-visible:outline-offset-4"
+																href={item.href}
+															>
+																{item.label}
+															</Link>
+														</li>
+													);
+												}
+
+												case "separator": {
+													return (
+														<hr
+															class="h-0 w-full border-t border-stroke-weak"
+															role="presentation"
+														/>
+													);
+												}
+
+												case "action": {
+													break;
+												}
+											}
+										})}
+									</ul>
+								</details>
+							</li>
+						);
+					}
+
+					case "separator": {
+						return <li class="h-0 w-full border-t border-stroke-weak" role="presentation" />;
+					}
+				}
+			})}
 		</ul>
 	</MobileNavMenu>
 </header>

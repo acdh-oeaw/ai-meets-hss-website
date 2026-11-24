@@ -51,26 +51,24 @@ const Content = page.content;
 	<DocumentBody>
 		<DefaultLayout>
 			<div class="relative w-full border-b border-stroke-weak">
-				{
-					image != null && image.src != null ? (
-						<figure class="absolute inset-0 -z-10 size-full overflow-hidden">
-							<Image
-								alt=""
-								class="size-full object-cover"
-								fetchpriority="high"
-								layout="full-width"
-								loading="eager"
-								src={image.src}
-							/>
-							<div class="absolute inset-0 size-full bg-black/60" />
-							{image.caption ? (
-								<figcaption class="absolute right-2 bottom-1.5 z-10 text-xs font-medium text-white/50">
-									{image.caption}
-								</figcaption>
-							) : null}
-						</figure>
-					) : null
-				}
+				{image != null && image.src != null ? (
+					<figure class="absolute inset-0 -z-10 size-full overflow-hidden">
+						<Image
+							alt=""
+							class="size-full object-cover"
+							fetchpriority="high"
+							layout="full-width"
+							loading="eager"
+							src={image.src}
+						/>
+						<div class="absolute inset-0 size-full bg-black/60" />
+						{image.caption ? (
+							<figcaption class="absolute right-2 bottom-1.5 z-10 text-xs font-medium text-white/50">
+								{image.caption}
+							</figcaption>
+						) : null}
+					</figure>
+				) : null}
 				<section class="container richtext max-w-(--breakpoint-md) px-4 py-6 xs:py-16 sm:px-8">
 					<h1
 						class="py-8 text-3xl font-extrabold tracking-tight lowercase xs:text-6xl"
@@ -80,9 +78,7 @@ const Content = page.content;
 					</h1>
 				</section>
 			</div>
-			<section
-				class="container richtext max-w-(--breakpoint-md) px-4 py-12 sm:px-8 [&_img]:max-w-48 [&_img]:rounded-sm [&_img]:border [&_img]:border-stroke-weak"
-			>
+			<section class="container richtext max-w-(--breakpoint-md) px-4 py-12 sm:px-8 [&_img]:max-w-48 [&_img]:rounded-sm [&_img]:border [&_img]:border-stroke-weak">
 				<Content />
 			</section>
 		</DefaultLayout>

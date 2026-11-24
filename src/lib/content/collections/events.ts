@@ -44,7 +44,6 @@ function createEventsCollection<TLocale extends IntlLocale>(locale: TLocale) {
 			const module = context.createJavaScriptImport<MDXContent>(String(output));
 			const tableOfContents = output.data.tableOfContents ?? [];
 			const image =
-				// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
 				_image != null
 					? context.createImportDeclaration<ImageMetadata>(path.join(publicPath, _image))
 					: null;

@@ -49,7 +49,6 @@ function createPagesCollection<TLocale extends IntlLocale>(locale: TLocale) {
 			const module = context.createJavaScriptImport<MDXContent>(String(output));
 			const tableOfContents = output.data.tableOfContents ?? [];
 			const src =
-				// eslint-disable-next-line @typescript-eslint/prefer-optional-chain, @typescript-eslint/no-unnecessary-condition
 				_image != null && _image.src != null
 					? context.createImportDeclaration<ImageMetadata>(path.join(publicPath, _image.src))
 					: null;

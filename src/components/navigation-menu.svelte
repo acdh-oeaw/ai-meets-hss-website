@@ -39,9 +39,8 @@
 			return;
 		}
 
-		// eslint-disable-next-line @typescript-eslint/no-misused-promises
+		// oxlint-disable-next-line typescript/no-misused-promises
 		return autoUpdate(triggerElement, popoverElement, async () => {
-			// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
 			if (triggerElement == null || popoverElement == null) {
 				return;
 			}

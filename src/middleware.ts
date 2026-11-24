@@ -23,7 +23,7 @@ export const onRequest = defineMiddleware(async (context, next) => {
 	} else if (context.routePattern === "/404") {
 		const _prefix = context.url.pathname.split("/", 2).at(1);
 
-		// eslint-disable-next-line unicorn/prefer-ternary
+		// oxlint-disable-next-line unicorn/prefer-ternary
 		if (_prefix != null && isValidPrefix(_prefix)) {
 			context.locals.locale = prefixToLocale[_prefix];
 		} else {

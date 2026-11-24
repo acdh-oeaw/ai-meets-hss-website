@@ -1,0 +1,32 @@
+{
+	"$schema": "./node_modules/oxfmt/configuration_schema.json",
+	"endOfLine": "lf",
+	"printWidth": 100,
+	"proseWrap": "always",
+	"semi": true,
+	"singleQuote": false,
+	"tabWidth": 2,
+	"trailingComma": "all",
+	"useTabs": true,
+	"sortPackageJson": false,
+	"svelte": {},
+	"astro": {},
+	"associations": [
+		{
+			"files": ["*.astro"],
+			"language": "astro"
+		},
+		{
+			"files": ["*.svelte"],
+			"language": "svelte"
+		}
+	],
+	"ignorePatterns": [
+		"pnpm-lock.yaml",
+		"pnpm-workspace.yaml",
+		"*.mdx",
+		"/content",
+		"/public",
+		"/e2e/snapshots"
+	]
+}
