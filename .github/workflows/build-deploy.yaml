@@ -74,14 +74,17 @@ jobs:
         uses: actions/checkout@v7
 
       - name: Ensure astro build artefacts folder exists
-        run: mkdir -p node_modules/.astro
+        run: mkdir -p node_modules/.astro/assets node_modules/.astro/fonts
 
       - name: Cache astro build artefacts
         uses: actions/cache@v6
         with:
-          path: node_modules/.astro/
-          key: ${{ runner.os }}-astro-26.x-${{ github.run_id }}
-          restore-keys: ${{ runner.os }}-astro-26.x
+          path: |
+            node_modules/.astro/assets/
+            node_modules/.astro/fonts/
+          key:
+            ${{ runner.os }}-astro-assets-fonts-26.x-${{ github.run_id }}-${{ github.run_attempt }}
+          restore-keys: ${{ runner.os }}-astro-assets-fonts-26.x-
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v4
@@ -109,7 +112,7 @@ jobs:
           push: true
           tags: "${{ steps.meta.outputs.tags }}"
           labels: "${{ steps.meta.outputs.labels }}"
-          build-args: |
+          build-args: &build-args |
             "PUBLIC_APP_BASE_PATH=${{ vars.PUBLIC_APP_BASE_PATH }}"
             # not using `outputs.public_url`, because that points to cluster-internal domain
             # "PUBLIC_APP_BASE_URL=${{ needs.vars.outputs.public_url }}"
@@ -117,19 +120,26 @@ jobs:
             "PUBLIC_BOTS=${{ vars.PUBLIC_BOTS }}"
             "PUBLIC_GOOGLE_SITE_VERIFICATION=${{ vars.PUBLIC_GOOGLE_SITE_VERIFICATION }}"
             "PUBLIC_IMPRINT_SERVICE_BASE_URL=${{ vars.PUBLIC_IMPRINT_SERVICE_BASE_URL }}"
-            "PUBLIC_KEYSTATIC_GITHUB_APP_SLUG=${{ vars.PUBLIC_KEYSTATIC_GITHUB_APP_SLUG }}"
-            "PUBLIC_KEYSTATIC_GITHUB_REPO_NAME=${{ vars.PUBLIC_KEYSTATIC_GITHUB_REPO_NAME }}"
-            "PUBLIC_KEYSTATIC_GITHUB_REPO_OWNER=${{ vars.PUBLIC_KEYSTATIC_GITHUB_REPO_OWNER }}"
-            "PUBLIC_KEYSTATIC_MODE=${{ vars.PUBLIC_KEYSTATIC_MODE }}"
             "PUBLIC_MATOMO_BASE_URL=${{ vars.PUBLIC_MATOMO_BASE_URL }}"
             "PUBLIC_MATOMO_ID=${{ vars.PUBLIC_MATOMO_ID }}"
             "PUBLIC_REDMINE_ID=${{ vars.SERVICE_ID }}"
-          secrets: |
-            "KEYSTATIC_GITHUB_CLIENT_ID=${{ secrets.K8S_SECRET_KEYSTATIC_GITHUB_CLIENT_ID }}"
-            "KEYSTATIC_GITHUB_CLIENT_SECRET=${{ secrets.K8S_SECRET_KEYSTATIC_GITHUB_CLIENT_SECRET }}"
-            "KEYSTATIC_SECRET=${{ secrets.K8S_SECRET_KEYSTATIC_SECRET }}"
           cache-from: type=gha
           cache-to: type=gha,mode=max
+
+      # Reuse the build above, exporting only its updated Astro assets cache.
+      - name: Export astro build artefacts from Docker
+        uses: docker/build-push-action@v7
+        with:
+          context: .
+          target: astro-cache
+          outputs: type=local,dest=${{ runner.temp }}/astro-cache
+          build-args: *build-args
+          cache-from: type=gha
+
+      - name: Replace astro build artefacts with exported ones
+        run: |
+          rm -rf node_modules/.astro
+          mv "${{ runner.temp }}/astro-cache" node_modules/.astro
 
   deploy:
     name: Deploy docker image

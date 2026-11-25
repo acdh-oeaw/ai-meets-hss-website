@@ -1,6 +1,4 @@
-# syntax=docker/dockerfile:1-labs
-# labs version is needed for `COPY --exclude`.
-# @see https://docs.docker.com/reference/dockerfile/#copy---exclude
+# syntax=docker/dockerfile:1
 
 # using alpine base image to avoid `sharp` memory leaks.
 # @see https://sharp.pixelplumbing.com/install#linux-memory-allocator
@@ -16,17 +14,19 @@ WORKDIR /app
 USER node
 
 COPY --chown=node:node package.json pnpm-lock.yaml pnpm-workspace.yaml ./
-# COPY --chown=node:node ./patches ./patches
 
 ENV CI=true
-ENV SKIP_INSTALL_SIMPLE_GIT_HOOKS=1
-
+# Node is already supplied by the base image; keep runtime management local to developers.
+ENV PNPM_CONFIG_RUNTIME=false
 RUN pnpm fetch
+# Defer project preparation until the source files are available, while caching dependencies.
+RUN pnpm install --frozen-lockfile --offline --ignore-scripts
 
-COPY --chown=node:node ./ ./
+# Includes the restored Astro assets cache when present (see .dockerignore).
+COPY --chown=node:node --exclude=Caddyfile ./ ./
 
-# astro assets cache
-COPY --chown=node:node ./node_modules/.astro ./node_modules/.astro
+# Rebuild deferred dependencies and run the project's prepare hook with its sources available.
+RUN pnpm rebuild --pending
 
 ARG PUBLIC_APP_BASE_PATH
 ARG PUBLIC_APP_BASE_URL
@@ -40,43 +40,35 @@ ARG PUBLIC_REDMINE_ID
 # disable validation for runtime environment variables
 ENV ENV_VALIDATION=public
 
-RUN pnpm install --frozen-lockfile --prefer-offline
-
 ENV NODE_ENV=production
 
-# to mount secrets which need to be available at build time
-# @see https://docs.docker.com/build/building/secrets/
 RUN pnpm run build
+
+# Export the updated assets cache back to CI without including it in the runtime image.
+FROM scratch AS astro-cache
+
+COPY --from=build /app/node_modules/.astro/assets /assets
+COPY --from=build /app/node_modules/.astro/fonts /fonts
 
 # serve
 FROM caddy:2-alpine AS serve
 
+RUN addgroup -S -g 10001 caddy && adduser -S -D -H -u 10001 -G caddy caddy \
+	&& chown -R caddy:caddy /config /data
+
 WORKDIR /usr/share/caddy
 
 ARG PUBLIC_APP_BASE_PATH
+ENV APP_BASE_PATH=${PUBLIC_APP_BASE_PATH}
 
-# exclude assets which should have been optimized with `astro:assets`.
-COPY --from=build --exclude=assets/content/assets/ /app/dist /usr/share/caddy
+COPY Caddyfile /etc/caddy/Caddyfile
 
-RUN cat > /etc/caddy/Caddyfile <<EOF
-:3000 {
-	root * /usr/share/caddy
+# The build prunes unreferenced originals while preserving linked images and downloads.
+COPY --from=build /app/dist /usr/share/caddy
 
-	handle_path ${PUBLIC_APP_BASE_PATH}* {
-		redir / ${PUBLIC_APP_BASE_PATH}/en/ 302
+USER 10001:10001
 
-		header /_astro/* Cache-Control "public, max-age=31536000, immutable"
-
-		try_files {path} {path}/
-		file_server
-	}
-
-	handle_errors {
-		rewrite * /{err.status_code}.html
-		file_server
-	}
-}
-EOF
+RUN caddy validate --config /etc/caddy/Caddyfile --adapter caddyfile
 
 EXPOSE 3000
 

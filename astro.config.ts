@@ -1,8 +1,10 @@
 import * as path from "node:path";
 
 import mdx from "@astrojs/mdx";
+import react from "@astrojs/react";
 import sitemap from "@astrojs/sitemap";
 import svelte from "@astrojs/svelte";
+import keystatic from "@keystatic/astro";
 import tailwindcss from "@tailwindcss/vite";
 import { defineConfig, fontProviders } from "astro/config";
 import icon from "astro-icon";
@@ -14,6 +16,7 @@ import { localeToPrefix } from "./src/lib/i18n/routing";
 const env = loadEnv(process.env.NODE_ENV ?? "development", process.cwd(), "");
 
 export default defineConfig({
+	output: "static",
 	base: env.PUBLIC_APP_BASE_PATH,
 	fonts: [
 		{
@@ -24,6 +27,8 @@ export default defineConfig({
 		},
 	],
 	integrations: [
+		// The editor and its filesystem API exist only in the local development server.
+		...(process.env.NODE_ENV === "development" ? [react(), keystatic()] : []),
 		icon({
 			iconDir: "./src/assets/icons",
 			/** @see https://www.astroicon.dev/reference/configuration/#include */

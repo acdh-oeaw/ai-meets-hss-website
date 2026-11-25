@@ -1,83 +1,34 @@
-## .gitignore ##
+# Build context allowlist. Everything else stays outside Docker.
+**
 
-# dependencies
-node_modules/
-.pnpm-store/
+# Dependency manifests and application configuration.
+!package.json
+!pnpm-lock.yaml
+!pnpm-workspace.yaml
+!astro.config.ts
+!svelte.config.ts
+!tsconfig.json
+!keystatic.config.ts
 
-# logs
-*.log
+# Tailwind uses .gitignore to determine which sources to scan.
+!.gitignore
 
-# non-public environment variables
-.env.keys
-.env.local
-.env.*.local
+# Application sources and build-time content.
+!src/**
+!content/**
+!messages/**
+!public/**
+!scripts/content/**
+!scripts/i18n/**
+!scripts/prune-assets.ts
 
-# caches
-.stylelintcache
-*.tsbuildinfo
+# Runtime configuration is copied separately from the application sources.
+!Caddyfile
 
-# performance profiles
-*.cpuprofile
-*.heapprofile
-*.heapsnapshot
+# Only reusable Astro image and font caches, never installed dependencies.
+!node_modules/.astro/assets/**
+!node_modules/.astro/fonts/**
 
-# vercel
-.vercel
-
-# misc
-.DS_Store
-*.pem
-.idea/
-
-# astro
-.astro/
-dist/
-
-# self-signed certificates
-/certificates/
-
-# i18n
-/content/**/*.d.json.ts
-/messages/**/*.d.json.ts
-
-# test
-/coverage/
-
-# playwright
-/blob-report/
-/playwright/.cache/
-/playwright-report/
-/test-results/
-
-# generated content
-.content/
-
-
-## .dockerignore ##
-
-# git
-.git/
-.gitattributes
-# must be allowed because `tailwindcss` v4 will use `.gitignore` to determine which
-# files and folders can be skipped by the compiler.
-# .gitignore
-
-# github
-.github/
-
-# vscode settings
-.vscode/
-
-# environment variables
-.env
-.env.*
-
-# tests
-/e2e/
-/test/
-
-# misc
-.editorconfig
-
-# astro assets cache
-!/node_modules/.astro/
+# Regenerate declarations during preparation; tests are not part of the build.
+**/*.d.json.ts
+**/*.test.*

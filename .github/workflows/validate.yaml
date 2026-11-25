@@ -76,6 +76,9 @@ jobs:
       - name: Format
         run: pnpm run format:check
 
+      - name: Test asset pruning
+        run: pnpm run test:assets
+
       - name: Transform content
         run: pnpm run content:build
 

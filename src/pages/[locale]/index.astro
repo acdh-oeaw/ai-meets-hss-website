@@ -1,8 +1,8 @@
 ---
 import type { GetStaticPathsResult } from "astro";
-import { Image } from "astro:assets";
 
 import DefaultLayout from "@/components/default-layout.astro";
+import HeroImage from "@/components/hero-image.astro";
 import DocumentBody from "@/components/document-body.astro";
 import DocumentHead from "@/components/document-head.astro";
 import DocumentMetadata from "@/components/document-metadata.astro";
@@ -40,14 +40,7 @@ const Content = page.content;
 		<DefaultLayout>
 			<section class="relative w-full overflow-hidden">
 				<div class="absolute inset-0 -z-10 size-full">
-					<Image
-						alt=""
-						class="size-full object-cover"
-						fetchpriority="high"
-						layout="full-width"
-						loading="eager"
-						src={image}
-					/>
+					<HeroImage src={image} />
 					<div class="absolute inset-0 size-full bg-black/60"></div>
 				</div>
 
