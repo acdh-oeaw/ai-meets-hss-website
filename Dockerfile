@@ -16,12 +16,14 @@ USER node
 COPY --chown=node:node package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 
 ENV CI=true
+# Node is already supplied by the base image; keep runtime management local to developers.
+ENV PNPM_CONFIG_RUNTIME=false
 RUN pnpm fetch
 # Defer project preparation until the source files are available, while caching dependencies.
 RUN pnpm install --frozen-lockfile --offline --ignore-scripts
 
 # Includes the restored Astro assets cache when present (see .dockerignore).
-COPY --chown=node:node ./ ./
+COPY --chown=node:node --exclude=Caddyfile ./ ./
 
 # Rebuild deferred dependencies and run the project's prepare hook with its sources available.
 RUN pnpm rebuild --pending
@@ -45,7 +47,8 @@ RUN pnpm run build
 # Export the updated assets cache back to CI without including it in the runtime image.
 FROM scratch AS astro-cache
 
-COPY --from=build /app/node_modules/.astro /
+COPY --from=build /app/node_modules/.astro/assets /assets
+COPY --from=build /app/node_modules/.astro/fonts /fonts
 
 # serve
 FROM caddy:2-alpine AS serve

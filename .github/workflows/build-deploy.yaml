@@ -74,14 +74,17 @@ jobs:
         uses: actions/checkout@v7
 
       - name: Ensure astro build artefacts folder exists
-        run: mkdir -p node_modules/.astro
+        run: mkdir -p node_modules/.astro/assets node_modules/.astro/fonts
 
       - name: Cache astro build artefacts
         uses: actions/cache@v6
         with:
-          path: node_modules/.astro/
-          key: ${{ runner.os }}-astro-26.x-${{ github.run_id }}-${{ github.run_attempt }}
-          restore-keys: ${{ runner.os }}-astro-26.x
+          path: |
+            node_modules/.astro/assets/
+            node_modules/.astro/fonts/
+          key:
+            ${{ runner.os }}-astro-assets-fonts-26.x-${{ github.run_id }}-${{ github.run_attempt }}
+          restore-keys: ${{ runner.os }}-astro-assets-fonts-26.x-
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v4
