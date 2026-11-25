@@ -5,6 +5,7 @@ import type { GetStaticPathsResult } from "astro";
 import { Image } from "astro:assets";
 
 import DefaultLayout from "@/components/default-layout.astro";
+import HeroImage from "@/components/hero-image.astro";
 import DocumentBody from "@/components/document-body.astro";
 import DocumentHead from "@/components/document-head.astro";
 import DocumentMetadata from "@/components/document-metadata.astro";
@@ -50,14 +51,7 @@ const events = await client.collections.events.all();
 			<div class="relative w-full border-b border-stroke-weak">
 				{image != null && image.src != null ? (
 					<figure class="absolute inset-0 -z-10 size-full overflow-hidden">
-						<Image
-							alt=""
-							class="size-full object-cover"
-							fetchpriority="high"
-							layout="full-width"
-							loading="eager"
-							src={image.src}
-						/>
+						<HeroImage src={image.src} />
 						<div class="absolute inset-0 size-full bg-black/60" />
 						{image.caption ? (
 							<figcaption class="absolute right-2 bottom-1.5 z-10 text-xs font-medium text-white/50">
@@ -96,11 +90,14 @@ const events = await client.collections.events.all();
 									<div class="relative aspect-video border-b border-stroke-weak">
 										{image?.src != null ? (
 											<Fragment>
-												<img
+												<Image
 													alt=""
 													class="absolute inset-0 size-full object-cover"
 													loading="lazy"
-													src={image.src}
+													src={image}
+													width={Math.min(image.width, 640)}
+													widths={[320, 480, 640, 960].filter((width) => width <= image.width)}
+													sizes="(min-width: 1024px) 304px, (min-width: 688px) calc((100vw - 88px) / 2), calc(100vw - 32px)"
 												/>
 												<div class="absolute inset-0 size-full bg-black/30" />
 											</Fragment>

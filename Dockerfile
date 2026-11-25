@@ -60,8 +60,8 @@ ENV APP_BASE_PATH=${PUBLIC_APP_BASE_PATH}
 
 COPY Caddyfile /etc/caddy/Caddyfile
 
-# exclude assets which should have been optimized with `astro:assets`.
-COPY --from=build --exclude=assets/content/assets/ /app/dist /usr/share/caddy
+# The build prunes unreferenced originals while preserving linked images and downloads.
+COPY --from=build /app/dist /usr/share/caddy
 
 USER 10001:10001
 

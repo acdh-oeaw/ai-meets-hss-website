@@ -2,9 +2,9 @@
 import assert from "node:assert/strict";
 
 import type { GetStaticPathsResult } from "astro";
-import { Image } from "astro:assets";
 
 import DefaultLayout from "@/components/default-layout.astro";
+import HeroImage from "@/components/hero-image.astro";
 import DocumentBody from "@/components/document-body.astro";
 import DocumentHead from "@/components/document-head.astro";
 import DocumentMetadata from "@/components/document-metadata.astro";
@@ -53,14 +53,7 @@ const Content = page.content;
 			<div class="relative w-full border-b border-stroke-weak">
 				{image != null ? (
 					<figure class="absolute inset-0 -z-10 size-full overflow-hidden">
-						<Image
-							alt=""
-							class="size-full object-cover"
-							fetchpriority="high"
-							layout="full-width"
-							loading="eager"
-							src={image}
-						/>
+						<HeroImage src={image} />
 						<div class="absolute inset-0 size-full bg-black/60" />
 					</figure>
 				) : null}

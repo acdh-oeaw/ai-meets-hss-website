@@ -22,7 +22,8 @@
 	"scripts": {
 		"app:build": "astro build",
 		"app:dev": "astro dev",
-		"build": "run-s content:build app:build",
+		"build": "run-s content:build app:build assets:prune",
+		"assets:prune": "tsx ./scripts/prune-assets.ts",
 		"content:build": "node --env-file-if-exists=.env --env-file-if-exists=.env.local --import=tsx ./scripts/content/generate-content.ts build",
 		"content:dev": "node --env-file-if-exists=.env --env-file-if-exists=.env.local --import=tsx ./scripts/content/generate-content.ts watch",
 		"dev": "concurrently --kill-others --names \"content,app\" --prefix-colors \"auto\" \"pnpm:content:dev\" \"pnpm:app:dev\"",
@@ -41,6 +42,7 @@
 		"start": "astro preview",
 		"sync": "astro sync",
 		"test:e2e": "playwright test --config ./e2e/playwright.config.ts",
+		"test:assets": "tsx --test ./scripts/prune-assets.test.ts",
 		"test:e2e:codegen": "playwright codegen",
 		"test:e2e:install": "playwright install --with-deps",
 		"test:e2e:ui": "pnpm run test:e2e --ui",
